@@ -2,11 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Models\SmsLog;
 use App\Services\Sms\SetareganSmsClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
@@ -25,54 +25,45 @@ class SendSmsJob implements ShouldQueue
         public string $to,
         public string $message,
         public ?int $userId = null,
-        public ?int $smsLogId = null,
     ) {}
 
     public function handle(SetareganSmsClient $client): void
     {
-        $log = $this->resolveLog();
+        $context = [
+            'to' => $this->to,
+            'user_id' => $this->userId,
+            'gateway' => config('services.sms.gateway'),
+        ];
+
+        Log::channel('sms')->info('SMS send started', $context);
 
         try {
             $result = $client->send($this->to, $this->message);
 
-            $log->update([
-                'status' => $result['ok'] ? 'queued' : 'failed',
-                'provider_code' => $result['code'],
+            $context = array_merge($context, [
+                'ok' => $result['ok'],
+                'code' => $result['code'],
                 'provider_message' => $result['message'],
-                'provider_message_id' => data_get($result, 'data.message_id'),
+                'message_id' => data_get($result, 'data.message_id'),
                 'cost' => data_get($result, 'data.cost'),
-                'response' => $result['body'],
+                'http_status' => $result['status'],
             ]);
 
             if (! $result['ok']) {
+                Log::channel('sms')->error('SMS send failed', $context);
+
                 throw new RuntimeException(
                     sprintf('SMS send failed [%s]: %s', $result['code'] ?? 'unknown', $result['message'] ?? 'No message')
                 );
             }
+
+            Log::channel('sms')->info('SMS send queued', $context);
         } catch (Throwable $exception) {
-            if ($log->status !== 'failed') {
-                $log->update([
-                    'status' => 'failed',
-                    'provider_message' => $exception->getMessage(),
-                ]);
-            }
+            Log::channel('sms')->error('SMS send exception', array_merge($context, [
+                'exception' => $exception->getMessage(),
+            ]));
 
             throw $exception;
         }
-    }
-
-    protected function resolveLog(): SmsLog
-    {
-        if ($this->smsLogId !== null) {
-            return SmsLog::query()->findOrFail($this->smsLogId);
-        }
-
-        return SmsLog::query()->create([
-            'user_id' => $this->userId,
-            'to' => $this->to,
-            'message' => $this->message,
-            'gateway' => config('services.sms.gateway'),
-            'status' => 'pending',
-        ]);
     }
 }
