@@ -1,8 +1,21 @@
+@props([
+    'title' => null,
+    'class' => 'bg-bg min-h-screen overflow-hidden overflow-y-auto font-sans',
+    'dir' => null,
+    'lang' => null,
+])
+
+@php
+    $htmlLang = $lang ?? str_replace('_', '-', app()->getLocale());
+    $htmlDir = $dir ?? (str_starts_with(app()->getLocale(), 'fa') ? 'rtl' : 'ltr');
+    $pageTitle = $title ?? config('app.name', 'Laravel');
+@endphp
 <!doctype html>
-<html lang="en">
+<html lang="{{ $htmlLang }}" dir="{{ $htmlDir }}">
 <head>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $pageTitle }}</title>
 
     @livewireStyles
     @vite(['resources/css/app.css'])
@@ -12,9 +25,9 @@
     </script>
 </head>
 
-<body class="{{ $class ?? 'bg-bg min-h-screen overflow-hidden overflow-y-auto' }}">
+<body {{ $attributes->class([$class]) }}>
     {{ $slot }}
     @livewireScripts
-    @vite(['resources/js/app.js','resources/js/flexilla.js'])
+    @vite(['resources/js/app.js', 'resources/js/flexilla.js'])
 </body>
 </html>

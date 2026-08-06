@@ -1,0 +1,44 @@
+{
+    "installed": [
+        {
+            "name": "flexiwind-base",
+            "namespace": "@flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "button-helper",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "button",
+            "namespace": "@flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "label",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "input-group",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "input",
+            "namespace": "@flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "input-group",
+            "namespace": "@flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "icon",
+            "namespace": "@flexiwind",
+            "version": "1.0.0"
+        }
+    ]
+}
