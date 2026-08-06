@@ -27,7 +27,7 @@
 
 <body {{ $attributes->class([$class]) }}>
     {{ $slot }}
-    @livewireScripts
     @vite(['resources/js/app.js', 'resources/js/flexilla.js'])
+    @livewireScripts
 </body>
 </html>

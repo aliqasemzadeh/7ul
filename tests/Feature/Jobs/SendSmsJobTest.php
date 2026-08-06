@@ -6,9 +6,10 @@ use App\Jobs\SendSmsJob;
 use App\Models\User;
 use App\Services\Sms\SetareganSmsClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -29,7 +30,7 @@ class SendSmsJobTest extends TestCase
 
     public function test_job_logs_successful_sms_send(): void
     {
-        Log::fake();
+        Event::fake([MessageLogged::class]);
 
         $user = User::factory()->create();
 
@@ -51,12 +52,15 @@ class SendSmsJobTest extends TestCase
             userId: $user->id,
         ))->handle(app(SetareganSmsClient::class));
 
-        Log::channel('sms')->assertLogged('info', fn ($message) => str_contains($message, 'SMS send queued'));
+        Event::assertDispatched(MessageLogged::class, function (MessageLogged $event): bool {
+            return $event->level === 'info'
+                && str_contains($event->message, 'SMS send queued');
+        });
     }
 
     public function test_job_logs_failed_sms_send(): void
     {
-        Log::fake();
+        Event::fake([MessageLogged::class]);
 
         $user = User::factory()->create();
 
@@ -81,6 +85,9 @@ class SendSmsJobTest extends TestCase
             $this->assertStringContainsString('invalid_token', $exception->getMessage());
         }
 
-        Log::channel('sms')->assertLogged('error', fn ($message) => str_contains($message, 'SMS send failed'));
+        Event::assertDispatched(MessageLogged::class, function (MessageLogged $event): bool {
+            return $event->level === 'error'
+                && str_contains($event->message, 'SMS send failed');
+        });
     }
 }

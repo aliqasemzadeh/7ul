@@ -1,4 +1,22 @@
-import { disableTransitionsTemporarily } from '@flexilla/utilities';
+function disableTransitionsTemporarily(callback) {
+    const style = document.createElement('style');
+    style.appendChild(
+        document.createTextNode(
+            '*,*::before,*::after{-webkit-transition:none!important;transition:none!important;animation:none!important}',
+        ),
+    );
+    document.head.appendChild(style);
+
+    callback();
+
+    window.getComputedStyle(document.documentElement).getPropertyValue('opacity');
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            style.remove();
+        });
+    });
+}
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('theme', {
