@@ -9,6 +9,7 @@
         "infer-conventions",
         "laravel-best-practices",
         "livewire-development",
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "flexiwind"
     ]
 }
