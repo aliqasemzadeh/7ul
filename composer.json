@@ -10,6 +10,7 @@
         "drpshtiwan/livewire-async-select": "^3.3",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "livewire/livewire": "^4.3",
         "opcodesio/log-viewer": "^3.24"
     },
     "require-dev": {
