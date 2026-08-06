@@ -32,5 +32,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="SMS_TOKEN" value="test-token"/>
+        <env name="SMS_GATEWAY" value="1000"/>
+        <env name="SMS_URL" value="https://srscrm.ir/api/sms/send"/>
     </php>
 </phpunit>
