@@ -7,7 +7,6 @@ Route::livewire('/', 'pages::index')->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::livewire('/login', 'pages::auth.login')->name('login');
-    Route::livewire('/register', 'pages::auth.register')->name('register');
 });
 
 Route::post('/logout', function () {

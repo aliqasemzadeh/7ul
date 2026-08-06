@@ -45,13 +45,10 @@ new #[Layout('components.layouts.base', [
         $this->validateOnly('mobile');
         $this->ensureIsNotRateLimited();
 
-        $user = User::query()->where('mobile', $this->mobile)->first();
-
-        if (! $user) {
-            throw ValidationException::withMessages([
-                'mobile' => __('app.auth.user_not_found'),
-            ]);
-        }
+        $user = User::query()->firstOrCreate(
+            ['mobile' => $this->mobile],
+            ['registration_ip' => request()->ip()],
+        );
 
         $sendMobileOtp->handle($user);
         $this->hitRateLimiters();
@@ -85,10 +82,6 @@ new #[Layout('components.layouts.base', [
             throw ValidationException::withMessages([
                 'otp' => $this->otpErrorMessage($result),
             ]);
-        }
-
-        if ($user->mobile_verified_at === null) {
-            $user->forceFill(['mobile_verified_at' => now()])->save();
         }
 
         session()->regenerate();
@@ -172,9 +165,9 @@ new #[Layout('components.layouts.base', [
             </span>
         </a>
 
-        <x-ui.button :href="route('register')" variant="ghost" size="sm" wire:navigate>
-            {{ __('app.auth.go_register') }}
-        </x-ui.button>
+        <div class="flex items-center gap-2">
+            <x-ui.theme-toggle />
+        </div>
     </header>
 
     <main class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 pb-16 pt-8 sm:px-8">
@@ -206,7 +199,7 @@ new #[Layout('components.layouts.base', [
                             class="w-full"
                         />
                         @error('mobile')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -245,7 +238,7 @@ new #[Layout('components.layouts.base', [
                             class="w-full tracking-[0.4em]"
                         />
                         @error('otp')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -264,13 +257,6 @@ new #[Layout('components.layouts.base', [
                     </div>
                 </form>
             @endif
-
-            <p class="mt-8 text-center text-sm text-fg-muted">
-                {{ __('app.auth.no_account') }}
-                <a href="{{ route('register') }}" wire:navigate class="font-semibold text-primary hover:underline">
-                    {{ __('app.auth.go_register') }}
-                </a>
-            </p>
         </div>
     </main>
 </div>
