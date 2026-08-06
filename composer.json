@@ -9,6 +9,7 @@
         "php": "^8.3",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "opcodesio/log-viewer": "^3.24",
         "wireui/wireui": "^2.6"
     },
     "require-dev": {
