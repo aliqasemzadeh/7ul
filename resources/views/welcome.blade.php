@@ -30,6 +30,7 @@
 
             @if (Route::has('login'))
                 <nav class="flex items-center gap-2 sm:gap-3">
+                    <x-ui.theme-toggle />
                     @auth
                         <x-ui.button :href="url('/dashboard')" size="sm">
                             {{ __('app.welcome.nav.dashboard') }}
@@ -38,12 +39,11 @@
                         <x-ui.button :href="route('login')" variant="ghost" size="sm">
                             {{ __('app.welcome.nav.login') }}
                         </x-ui.button>
-                        @if (Route::has('register'))
-                            <x-ui.button :href="route('register')" size="sm">
-                                {{ __('app.welcome.nav.register') }}
-                            </x-ui.button>
-                        @endif
                     @endauth
+                </nav>
+            @else
+                <nav class="flex items-center gap-2 sm:gap-3">
+                    <x-ui.theme-toggle />
                 </nav>
             @endif
         </header>

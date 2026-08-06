@@ -3,11 +3,12 @@
 namespace Tests\Feature\Jobs;
 
 use App\Jobs\SendSmsJob;
-use App\Models\SmsLog;
 use App\Models\User;
+use App\Services\Sms\SetareganSmsClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -28,15 +29,9 @@ class SendSmsJobTest extends TestCase
 
     public function test_job_logs_successful_sms_send(): void
     {
-        $user = User::factory()->create();
+        Log::fake();
 
-        $log = SmsLog::query()->create([
-            'user_id' => $user->id,
-            'to' => $user->mobile,
-            'message' => 'test message',
-            'gateway' => '1000',
-            'status' => 'pending',
-        ]);
+        $user = User::factory()->create();
 
         Http::fake([
             'https://srscrm.ir/api/sms/send' => Http::response([
@@ -54,29 +49,16 @@ class SendSmsJobTest extends TestCase
             to: $user->mobile,
             message: 'test message',
             userId: $user->id,
-            smsLogId: $log->id,
-        ))->handle(app(\App\Services\Sms\SetareganSmsClient::class));
+        ))->handle(app(SetareganSmsClient::class));
 
-        $log->refresh();
-
-        $this->assertSame('queued', $log->status);
-        $this->assertSame('queued', $log->provider_code);
-        $this->assertSame(42, $log->provider_message_id);
-        $this->assertEquals('120.00', $log->cost);
-        $this->assertIsArray($log->response);
+        Log::channel('sms')->assertLogged('info', fn ($message) => str_contains($message, 'SMS send queued'));
     }
 
     public function test_job_logs_failed_sms_send(): void
     {
-        $user = User::factory()->create();
+        Log::fake();
 
-        $log = SmsLog::query()->create([
-            'user_id' => $user->id,
-            'to' => $user->mobile,
-            'message' => 'test message',
-            'gateway' => '1000',
-            'status' => 'pending',
-        ]);
+        $user = User::factory()->create();
 
         Http::fake([
             'https://srscrm.ir/api/sms/send' => Http::response([
@@ -92,17 +74,13 @@ class SendSmsJobTest extends TestCase
                 to: $user->mobile,
                 message: 'test message',
                 userId: $user->id,
-                smsLogId: $log->id,
-            ))->handle(app(\App\Services\Sms\SetareganSmsClient::class));
+            ))->handle(app(SetareganSmsClient::class));
 
             $this->fail('Expected RuntimeException was not thrown.');
         } catch (RuntimeException $exception) {
             $this->assertStringContainsString('invalid_token', $exception->getMessage());
         }
 
-        $log->refresh();
-
-        $this->assertSame('failed', $log->status);
-        $this->assertSame('invalid_token', $log->provider_code);
+        Log::channel('sms')->assertLogged('error', fn ($message) => str_contains($message, 'SMS send failed'));
     }
 }

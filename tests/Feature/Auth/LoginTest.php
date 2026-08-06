@@ -30,7 +30,36 @@ class LoginTest extends TestCase
         $this->get(route('login'))->assertOk();
     }
 
-    public function test_user_can_login_with_mobile_otp(): void
+    public function test_new_mobile_is_registered_and_can_verify_otp(): void
+    {
+        Queue::fake();
+
+        $component = Livewire::test('pages::auth.login')
+            ->set('mobile', '09121112233')
+            ->call('sendCode')
+            ->assertHasNoErrors()
+            ->assertSet('step', 'otp');
+
+        $user = User::query()->where('mobile', '09121112233')->first();
+
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->registration_ip);
+
+        Queue::assertPushed(SendSmsJob::class);
+
+        $otp = $user->oneTimePasswords()->first();
+        $this->assertNotNull($otp);
+
+        $component
+            ->set('otp', $otp->password)
+            ->call('verify')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($user->fresh());
+    }
+
+    public function test_existing_user_can_login_with_mobile_otp(): void
     {
         Queue::fake();
 
@@ -56,18 +85,7 @@ class LoginTest extends TestCase
             ->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($user);
-    }
-
-    public function test_login_fails_for_unknown_mobile(): void
-    {
-        Queue::fake();
-
-        Livewire::test('pages::auth.login')
-            ->set('mobile', '09129998877')
-            ->call('sendCode')
-            ->assertHasErrors(['mobile']);
-
-        Queue::assertNothingPushed();
+        $this->assertSame(1, User::query()->where('mobile', '09123334455')->count());
     }
 
     public function test_login_fails_with_invalid_otp(): void
