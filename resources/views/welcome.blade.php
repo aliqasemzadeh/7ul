@@ -68,6 +68,7 @@
                 <form
                     class="mt-10 w-full"
                     onsubmit="return false;"
+
                     aria-label="{{ __('app.welcome.shorten') }}"
                 >
                     <x-ui.input.group
