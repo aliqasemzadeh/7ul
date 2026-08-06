@@ -12,7 +12,7 @@
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",
         "opcodesio/log-viewer": "^3.24",
-        "spatie/laravel-one-time-passwords": "*"
+        "spatie/laravel-one-time-passwords": "^1.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
