@@ -119,6 +119,17 @@
         --ui-soft-text: var(--color-gray-300);
     }
 }
+
+@utility ui-soft-primary {
+    --ui-soft-bg: --alpha(var(--color-primary-100) / 50%);
+    --ui-soft-text: var(--color-primary-600);
+
+    &:is(.dark *) {
+        --ui-soft-bg: --alpha(var(--color-primary-900) / 30%);
+        --ui-soft-text: var(--color-primary-300);
+    }
+}
+
 @utility ui-soft-success {
     --ui-soft-bg: --alpha(var(--color-success-100) / 40%);
     --ui-soft-text: var(--color-success-600);
