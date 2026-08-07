@@ -10,7 +10,13 @@ return [
         'tagline_highlight' => 'short',
         'subtitle' => 'With Seven Up Link, shorten your links, track clicks, and strengthen your brand.',
         'url_placeholder' => 'Paste your link here...',
+        'url_required' => 'A URL is required.',
+        'url_invalid' => 'Please enter a valid URL.',
         'shorten' => 'Shorten',
+        'your_link' => 'Your short link',
+        'copy' => 'Copy link',
+        'copied' => 'Copied!',
+        'view_stats' => 'View stats',
         'terms' => 'By using our service, you agree to our :terms.',
         'terms_link' => 'Terms of Service',
         'nav' => [

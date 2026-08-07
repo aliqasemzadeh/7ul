@@ -13,21 +13,29 @@ class LinkShortenerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_from_shortener_page(): void
+    public function test_guests_are_redirected_to_login_when_shortening_from_home(): void
     {
-        $this->get(route('shortener'))->assertRedirect(route('login'));
+        Livewire::test('pages::index')
+            ->set('url', 'https://example.com/path')
+            ->call('shorten')
+            ->assertRedirect(route('login'));
+
+        $this->assertDatabaseCount('links', 0);
     }
 
-    public function test_authenticated_user_can_generate_short_link(): void
+    public function test_guests_are_redirected_from_user_panel(): void
+    {
+        $this->get(route('user.index'))->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_can_shorten_from_home(): void
     {
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
-            ->test('pages::shortener')
-            ->set('destination', 'https://example.com/path')
-            ->set('type', LinkTypeEnum::Link->value)
-            ->set('isPublic', true)
-            ->call('generateShortLink')
+            ->test('pages::index')
+            ->set('url', 'https://example.com/path')
+            ->call('shorten')
             ->assertHasNoErrors()
             ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')));
 
@@ -42,12 +50,45 @@ class LinkShortenerTest extends TestCase
         $this->assertNotNull($link->creator_ip);
     }
 
-    public function test_destination_is_required_to_generate_short_link(): void
+    public function test_url_is_required_to_shorten_from_home(): void
     {
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
-            ->test('pages::shortener')
+            ->test('pages::index')
+            ->set('url', '')
+            ->call('shorten')
+            ->assertHasErrors(['url']);
+    }
+
+    public function test_authenticated_user_can_generate_professional_link_in_user_panel(): void
+    {
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::user.index')
+            ->set('destination', 'Hello professional text')
+            ->set('type', LinkTypeEnum::Text->value)
+            ->set('isPublic', false)
+            ->call('generateShortLink')
+            ->assertHasNoErrors()
+            ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')));
+
+        $link = Link::query()->first();
+
+        $this->assertNotNull($link);
+        $this->assertSame($user->id, $link->user_id);
+        $this->assertSame('Hello professional text', $link->destination);
+        $this->assertSame(LinkTypeEnum::Text, $link->type);
+        $this->assertFalse($link->is_public_stats);
+    }
+
+    public function test_destination_is_required_in_user_panel(): void
+    {
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::user.index')
             ->set('destination', '')
             ->call('generateShortLink')
             ->assertHasErrors(['destination']);
