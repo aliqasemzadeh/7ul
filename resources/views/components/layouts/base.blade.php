@@ -6,8 +6,11 @@
 ])
 
 @php
-    $htmlLang = $lang ?? str_replace('_', '-', app()->getLocale());
-    $htmlDir = $dir ?? (str_starts_with(app()->getLocale(), 'fa') ? 'rtl' : 'ltr');
+    $locale = app()->getLocale();
+    $localeRoot = strtolower(str_replace('_', '-', $locale));
+    $isRtl = str_starts_with($localeRoot, 'fa') || str_starts_with($localeRoot, 'ar');
+    $htmlLang = $lang ?? str_replace('_', '-', $locale);
+    $htmlDir = $dir ?? ($isRtl ? 'rtl' : 'ltr');
     $pageTitle = $title ?? config('app.name', 'Laravel');
 @endphp
 <!doctype html>

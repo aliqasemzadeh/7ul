@@ -19,11 +19,6 @@ new #[Layout('components.layouts.user')] class extends Component
 
     public ?string $shortCode = null;
 
-    public function mount(): void
-    {
-        app()->setLocale('fa');
-    }
-
     public function rendering($view): void
     {
         $view->title(__('app.panel.create.title'));

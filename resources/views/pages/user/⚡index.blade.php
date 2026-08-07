@@ -15,11 +15,6 @@ new #[Layout('components.layouts.user')] class extends Component
     #[Url]
     public string $search = '';
 
-    public function mount(): void
-    {
-        app()->setLocale('fa');
-    }
-
     public function rendering($view): void
     {
         $view->title(__('app.panel.links.title'));

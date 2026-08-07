@@ -14,7 +14,6 @@ new #[Layout('components.layouts.user')] class extends Component
 
     public function mount(string $shortCode): void
     {
-        app()->setLocale('fa');
         $this->shortCode = $shortCode;
 
         $link = Link::query()->where('short_code', $shortCode)->firstOrFail();

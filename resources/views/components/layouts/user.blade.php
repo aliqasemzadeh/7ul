@@ -5,6 +5,10 @@
 @php
     $user = auth()->user();
     $currentRoute = request()->route()?->getName();
+    $mobile = $user?->mobile;
+    $initials = $mobile
+        ? mb_substr($mobile, -2)
+        : __('app.welcome.brand_short');
 
     $items = [
         [
@@ -33,12 +37,10 @@
 
 <x-layouts.base
     :title="$title"
-    lang="fa"
-    dir="rtl"
     class="bg-bg text-fg min-h-screen font-sans antialiased"
 >
     <x-ui.sidebar-wrapper
-        class="fixed inset-y-0 end-0 z-80 flex h-dvh w-11/12 max-w-64 flex-col justify-between overflow-hidden border-s border-bg-muted/70 bg-bg-surface px-4 py-3 transition-all translate-x-full ease-linear fx-open:translate-x-0 md:w-64 md:translate-x-0 md:transition-none"
+        class="fixed inset-y-0 start-0 z-80 flex h-dvh w-11/12 max-w-64 flex-col justify-between overflow-hidden border-e border-bg-muted/70 bg-bg-surface px-4 py-3 transition-all ease-linear ltr:-translate-x-full rtl:translate-x-full fx-open:translate-x-0 md:w-64 md:translate-x-0 md:transition-none"
     >
         <div class="min-h-max border-b border-border py-2">
             <a href="{{ route('home') }}" class="flex items-center gap-x-3 font-semibold text-fg-title" wire:navigate>
@@ -69,22 +71,41 @@
             </ul>
         </nav>
 
-        <div class="space-y-3 border-t border-border pt-3">
-            <div class="rounded-ui border border-border-strong/40 p-2.5">
-                <p class="text-sm font-semibold text-fg-title" dir="ltr">{{ $user?->mobile }}</p>
-                <p class="mt-0.5 text-xs text-fg-muted">{{ __('app.panel.account') }}</p>
-            </div>
+        <div>
+            <ul class="flex flex-col gap-y-2 text-fg-muted">
+                <li class="w-full">
+                    <div class="flex w-full items-center gap-3 rounded-ui border border-border-strong/40 p-1.5">
+                        <span
+                            class="flex size-10 shrink-0 items-center justify-center rounded-ui bg-primary/15 text-sm font-bold text-primary"
+                            aria-hidden="true"
+                        >
+                            {{ $initials }}
+                        </span>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <x-ui.button type="submit" variant="ghost" size="sm" class="w-full justify-center">
-                    {{ __('app.shortener.logout') }}
-                </x-ui.button>
-            </form>
+                        <div class="flex flex-1 flex-col overflow-hidden text-start -space-y-0.5">
+                            <span class="truncate text-sm font-semibold text-fg-title" dir="ltr">
+                                {{ $mobile ?: __('app.panel.account') }}
+                            </span>
+                            <span class="truncate text-xs text-fg-muted">
+                                {{ __('app.panel.account') }}
+                            </span>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="w-full">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-ui.button type="submit" variant="ghost" size="sm" class="w-full justify-center">
+                            {{ __('app.shortener.logout') }}
+                        </x-ui.button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </x-ui.sidebar-wrapper>
 
-    <main class="min-h-screen md:pe-64">
+    <main class="min-h-screen md:ps-64">
         <header class="sticky top-0 z-35 flex h-16 w-full bg-bg/90 backdrop-blur">
             <div class="flex h-full w-full items-center justify-between px-4 sm:px-8">
                 <div class="flex items-center gap-3">

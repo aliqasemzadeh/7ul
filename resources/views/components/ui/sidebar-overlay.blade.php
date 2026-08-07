@@ -4,7 +4,6 @@
     {{ $attributes->class([
         'fixed inset-0',
         'backdrop-blur-sm' => $blured && $appearance === 'default',
-        'hidden fx-open:flex lg:fx-open:hidden z-40 bg-gray-800/40 hidden fx-open:flex lg:fx-open:hidden' =>
-            $appearance === 'default',
+        'z-40 hidden bg-gray-800/40 fx-open:flex md:fx-open:hidden' => $appearance === 'default',
     ]) }}>
 </div>

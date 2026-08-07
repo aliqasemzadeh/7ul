@@ -15,7 +15,6 @@ new #[Layout('components.layouts.user')] class extends Component
 
     public function mount(): void
     {
-        app()->setLocale('fa');
         $this->apiToken = Auth::user()->ensureApiToken();
     }
 
