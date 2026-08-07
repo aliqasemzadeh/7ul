@@ -10,9 +10,9 @@ use App\Http\Requests\Api\V1\StoreLinkRequest;
 use App\Http\Resources\Api\V1\LinkResource;
 use App\Http\Resources\Api\V1\LinkStatsResource;
 use App\Models\Link;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class LinkController extends Controller
 {
@@ -27,7 +27,7 @@ class LinkController extends Controller
         return LinkResource::collection($links);
     }
 
-    public function store(StoreLinkRequest $request, CreateShortLink $createShortLink): JsonResource
+    public function store(StoreLinkRequest $request, CreateShortLink $createShortLink): JsonResponse
     {
         $validated = $request->validated();
 
@@ -41,7 +41,9 @@ class LinkController extends Controller
 
         $link->loadCount('visits');
 
-        return (new LinkResource($link))->response()->setStatusCode(201);
+        return (new LinkResource($link))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(Request $request, string $shortCode): LinkResource
