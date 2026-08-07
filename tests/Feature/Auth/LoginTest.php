@@ -106,6 +106,49 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_send_code_rejects_non_iranian_mobile_formats(): void
+    {
+        Queue::fake();
+
+        Livewire::test('pages::auth.login')
+            ->set('mobile', '08121112233')
+            ->call('sendCode')
+            ->assertHasErrors(['mobile']);
+
+        Livewire::test('pages::auth.login')
+            ->set('mobile', '9121112233')
+            ->call('sendCode')
+            ->assertHasErrors(['mobile']);
+
+        Livewire::test('pages::auth.login')
+            ->set('mobile', '+989121112233')
+            ->call('sendCode')
+            ->assertHasErrors(['mobile']);
+
+        Livewire::test('pages::auth.login')
+            ->set('mobile', '0912111223')
+            ->call('sendCode')
+            ->assertHasErrors(['mobile']);
+
+        Queue::assertNothingPushed();
+        $this->assertGuest();
+    }
+
+    public function test_persian_digits_are_normalized_before_validation(): void
+    {
+        Queue::fake();
+
+        Livewire::test('pages::auth.login')
+            ->set('mobile', '۰۹۱۲۱۱۱۲۲۳۳')
+            ->call('sendCode')
+            ->assertHasNoErrors()
+            ->assertSet('mobile', '09121112233')
+            ->assertSet('step', 'otp');
+
+        $this->assertNotNull(User::query()->where('mobile', '09121112233')->first());
+        Queue::assertPushed(SendSmsJob::class);
+    }
+
     public function test_authenticated_users_are_redirected_from_login(): void
     {
         $user = User::factory()->create();

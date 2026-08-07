@@ -232,7 +232,7 @@ new #[Layout('components.layouts.base', [
                             dir="ltr"
                             :label="__('app.auth.mobile')"
                             :placeholder="__('app.auth.mobile_placeholder')"
-                            wire:model.live="mobile"
+                            wire:model.blur="mobile"
                             :invalid="$errors->has('mobile')"
                             class="w-full"
                         />
