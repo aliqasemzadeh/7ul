@@ -189,4 +189,31 @@ class LinkShortenerTest extends TestCase
             ->get(route('links.stats', $link->short_code))
             ->assertOk();
     }
+
+    public function test_soft_deleted_link_is_not_redirected(): void
+    {
+        $link = Link::factory()->create([
+            'destination' => 'https://example.com/target',
+            'type' => LinkTypeEnum::Link,
+        ]);
+
+        $link->delete();
+
+        $this->assertSoftDeleted($link);
+
+        $this->get(route('links.redirect', $link->short_code))
+            ->assertNotFound();
+    }
+
+    public function test_soft_deleted_link_stats_are_not_found(): void
+    {
+        $link = Link::factory()->create([
+            'is_public_stats' => true,
+        ]);
+
+        $link->delete();
+
+        $this->get(route('links.stats', $link->short_code))
+            ->assertNotFound();
+    }
 }
