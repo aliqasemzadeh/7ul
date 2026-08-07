@@ -2,28 +2,26 @@
 
 namespace App\Http\Requests\Api\V1;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Enums\LinkTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreLinkRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return $this->user() !== null;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
         return [
-            //
+            'destination' => ['required', 'string'],
+            'type' => ['required', Rule::enum(LinkTypeEnum::class)],
+            'is_public_stats' => ['sometimes', 'boolean'],
         ];
     }
 }
