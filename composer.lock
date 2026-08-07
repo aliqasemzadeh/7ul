@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "027ba87ab32aa18e97c572075eab4847",
+    "content-hash": "eb406ce110e830dcaebfa308e2e70f24",
     "packages": [
         {
             "name": "brick/math",
@@ -3663,6 +3663,69 @@
                 }
             ],
             "time": "2026-07-04T17:12:02+00:00"
+        },
+        {
+            "name": "sadegh19b/laravel-persian-validation",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sadegh19b/laravel-persian-validation.git",
+                "reference": "827b446c54121d9fcb0e06415788645c62f7dcd0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sadegh19b/laravel-persian-validation/zipball/827b446c54121d9fcb0e06415788645c62f7dcd0",
+                "reference": "827b446c54121d9fcb0e06415788645c62f7dcd0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sadegh19b\\LaravelPersianValidation\\PersianValidationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sadegh19b\\LaravelPersianValidation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sadegh Barzegar",
+                    "email": "sadegh19b@gmail.com",
+                    "homepage": "https://github.com/sadegh19b",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A comprehensive Laravel validation package for Persian text, numbers, dates, and Iranian national identifiers",
+            "homepage": "https://github.com/sadegh19b/laravel-persian-validation",
+            "keywords": [
+                "farsi",
+                "laravel",
+                "persian",
+                "validate",
+                "validation",
+                "validator"
+            ],
+            "support": {
+                "issues": "https://github.com/sadegh19b/laravel-persian-validation/issues",
+                "source": "https://github.com/sadegh19b/laravel-persian-validation/tree/v2.1.0"
+            },
+            "time": "2026-04-25T07:43:18+00:00"
         },
         {
             "name": "spatie/laravel-one-time-passwords",
