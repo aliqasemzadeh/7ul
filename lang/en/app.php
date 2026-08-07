@@ -57,7 +57,7 @@ return [
         'verify' => 'Verify & continue',
         'resend' => 'Resend code',
         'back' => 'Back',
-        'otp_message' => 'Your 7UL login code: :code',
+        'otp_message' => "Your 7UL login code: :code\nلغو11",
         'otp_sent' => 'Verification code sent.',
         'user_not_found' => 'No user found with this mobile number.',
         'throttle' => 'Please wait :seconds seconds and try again.',
