@@ -12,6 +12,7 @@
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",
+        "morilog/jalali": "^3.5",
         "opcodesio/log-viewer": "^3.24",
         "rappasoft/laravel-authentication-log": "^6.1",
         "sadegh19b/laravel-persian-validation": "^2.1",
