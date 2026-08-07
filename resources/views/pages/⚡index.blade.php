@@ -49,7 +49,7 @@ new #[Layout('components.layouts.base', [
             <nav class="flex items-center gap-2 sm:gap-3">
                 <x-ui.theme-toggle />
                 @auth
-                    <x-ui.button :href="url('/dashboard')" size="sm">
+                    <x-ui.button :href="route('shortener')" size="sm" wire:navigate>
                         {{ __('app.welcome.nav.dashboard') }}
                     </x-ui.button>
                 @else

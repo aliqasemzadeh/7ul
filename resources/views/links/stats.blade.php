@@ -75,7 +75,7 @@
                 </thead>
                 <tbody>
                     @forelse ($visits as $visit)
-                        <tr class="border-b border-border last:border-0" wire:key="visit-{{ $visit->id }}">
+                        <tr class="border-b border-border last:border-0">
                             <td class="px-4 py-3 whitespace-nowrap" dir="ltr">{{ $visit->created_at }}</td>
                             <td class="px-4 py-3" dir="ltr">{{ $visit->ip_address ?: __('app.shortener.unknown') }}</td>
                             <td class="px-4 py-3">{{ $visit->device_type ?: __('app.shortener.unknown') }}</td>
