@@ -26,6 +26,10 @@ class SendSmsJobTest extends TestCase
             'gateway' => '1000',
             'url' => 'https://srscrm.ir/api/sms/send',
         ]);
+
+        Config::set('logging.channels.sms', [
+            'driver' => 'null',
+        ]);
     }
 
     public function test_job_logs_successful_sms_send(): void
