@@ -1,9 +1,8 @@
 <?php
 
+use App\Http\Controllers\LinkController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\LinkController;
 
 Route::livewire('/', 'pages::index')->name('home');
 
@@ -21,7 +20,7 @@ Route::post('/logout', function () {
 })->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
-    Route::livewire('/shortener', 'pages::shortener')->name('shortener');
+    Route::livewire('/user', 'pages::user.index')->name('user.index');
 });
 
 Route::get('/stats/{shortCode}', [LinkController::class, 'stats'])

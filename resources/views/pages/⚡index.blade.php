@@ -1,5 +1,8 @@
 <?php
 
+use App\Actions\Links\CreateShortLink;
+use App\Enums\LinkTypeEnum;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -9,6 +12,12 @@ new #[Layout('components.layouts.base', [
     'class' => 'bg-bg text-fg min-h-screen font-sans antialiased',
 ])] class extends Component
 {
+    public string $url = '';
+
+    public ?string $shortLink = null;
+
+    public ?string $shortCode = null;
+
     public function mount(): void
     {
         app()->setLocale('fa');
@@ -17,6 +26,33 @@ new #[Layout('components.layouts.base', [
     public function rendering($view): void
     {
         $view->title(__('app.welcome.title'));
+    }
+
+    public function shorten(CreateShortLink $createShortLink): void
+    {
+        if (! Auth::check()) {
+            $this->redirect(route('login'), navigate: true);
+
+            return;
+        }
+
+        $validated = $this->validate([
+            'url' => ['required', 'url', 'max:2048'],
+        ], [
+            'url.required' => __('app.welcome.url_required'),
+            'url.url' => __('app.welcome.url_invalid'),
+        ]);
+
+        $link = $createShortLink->handle(
+            user: Auth::user(),
+            destination: $validated['url'],
+            type: LinkTypeEnum::Link,
+            isPublicStats: true,
+            creatorIp: request()->ip(),
+        );
+
+        $this->shortCode = $link->short_code;
+        $this->shortLink = url('/'.$link->short_code);
     }
 };
 ?>
@@ -49,7 +85,7 @@ new #[Layout('components.layouts.base', [
             <nav class="flex items-center gap-2 sm:gap-3">
                 <x-ui.theme-toggle />
                 @auth
-                    <x-ui.button :href="route('shortener')" size="sm" wire:navigate>
+                    <x-ui.button :href="route('user.index')" size="sm" wire:navigate>
                         {{ __('app.welcome.nav.dashboard') }}
                     </x-ui.button>
                 @else
@@ -84,7 +120,7 @@ new #[Layout('components.layouts.base', [
 
             <form
                 class="mt-10 w-full"
-                onsubmit="return false;"
+                wire:submit="shorten"
                 aria-label="{{ __('app.welcome.shorten') }}"
             >
                 <x-ui.input.group
@@ -96,8 +132,9 @@ new #[Layout('components.layouts.base', [
                         type="url"
                         name="url"
                         :placeholder="__('app.welcome.url_placeholder')"
+                        wire:model="url"
                         class="w-full flex-1 px-3 py-3 text-base text-fg placeholder:text-fg-muted sm:px-2"
-                        required
+                        :invalid="$errors->has('url')"
                     />
                     <x-ui.button
                         type="submit"
@@ -105,11 +142,50 @@ new #[Layout('components.layouts.base', [
                         :radius="false"
                         class="w-full justify-center gap-2 rounded-ui sm:w-auto sm:min-w-36"
                     >
-                        <span>{{ __('app.welcome.shorten') }}</span>
-                        <span class="iconify icon-[hugeicons--link-04] size-5" aria-hidden="true"></span>
+                        <span wire:loading.remove wire:target="shorten">{{ __('app.welcome.shorten') }}</span>
+                        <span wire:loading wire:target="shorten">...</span>
+                        <span class="iconify icon-[hugeicons--link-04] size-5" aria-hidden="true" wire:loading.remove wire:target="shorten"></span>
                     </x-ui.button>
                 </x-ui.input.group>
+                @error('url')
+                    <p class="mt-3 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
             </form>
+
+            @if ($shortLink)
+                <div
+                    class="mt-6 w-full rounded-ui border border-border bg-card p-4 text-start shadow-sm"
+                    x-data="{ copied: false }"
+                >
+                    <p class="text-sm font-medium text-fg-muted">{{ __('app.welcome.your_link') }}</p>
+                    <p class="mt-2 break-all font-semibold text-fg-title" dir="ltr" x-ref="shortLink">
+                        {{ $shortLink }}
+                    </p>
+                    <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+                        <x-ui.button
+                            type="button"
+                            size="md"
+                            class="w-full justify-center sm:flex-1"
+                            x-on:click="
+                                navigator.clipboard.writeText($refs.shortLink.innerText.trim());
+                                copied = true;
+                                setTimeout(() => copied = false, 2000);
+                            "
+                        >
+                            <span x-show="!copied">{{ __('app.welcome.copy') }}</span>
+                            <span x-cloak x-show="copied">{{ __('app.welcome.copied') }}</span>
+                        </x-ui.button>
+                        <x-ui.button
+                            :href="route('links.stats', $shortCode)"
+                            variant="outline"
+                            size="md"
+                            class="w-full justify-center sm:flex-1"
+                        >
+                            {{ __('app.welcome.view_stats') }}
+                        </x-ui.button>
+                    </div>
+                </div>
+            @endif
 
             <p class="mt-4 text-xs text-fg-muted">
                 {!! __('app.welcome.terms', [

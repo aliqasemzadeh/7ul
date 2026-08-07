@@ -29,7 +29,7 @@
             </a>
 
             @if (Route::has('login'))
-                <nav class="flex items-center gap-2 sm:gap-3">
+                <nav class="flex items-center gap-3 sm:gap-4">
                     <x-ui.theme-toggle />
                     @auth
                         <x-ui.button :href="url('/dashboard')" size="sm">
@@ -42,7 +42,7 @@
                     @endauth
                 </nav>
             @else
-                <nav class="flex items-center gap-2 sm:gap-3">
+                <nav class="flex items-center gap-3 sm:gap-4">
                     <x-ui.theme-toggle />
                 </nav>
             @endif

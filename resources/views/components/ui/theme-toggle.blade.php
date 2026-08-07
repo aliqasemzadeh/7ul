@@ -4,14 +4,14 @@
     :iconOnly="true"
     x-on:click="$store.theme.toggle()"
     :aria-label="__('app.auth.toggle_theme')"
-    class="relative"
+    class="relative shrink-0 overflow-hidden"
 >
     <span
-        class="iconify icon-[hugeicons--sun-01] absolute start-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 duration-200 ease-linear invisible dark:visible"
+        class="iconify icon-[hugeicons--moon-02] size-4 transition duration-200 ease-linear dark:scale-0 dark:opacity-0"
         aria-hidden="true"
     ></span>
     <span
-        class="iconify icon-[hugeicons--moon-02] absolute start-1/2 top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 duration-200 ease-linear visible dark:invisible"
+        class="iconify icon-[hugeicons--sun-01] absolute inset-0 m-auto size-4 transition duration-200 ease-linear scale-0 opacity-0 dark:scale-100 dark:opacity-100"
         aria-hidden="true"
     ></span>
 </x-ui.button>

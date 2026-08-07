@@ -82,7 +82,7 @@ new #[Layout('components.layouts.base', [
             </span>
         </a>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3 sm:gap-4">
             <x-ui.theme-toggle />
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
