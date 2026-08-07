@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Links\GetLinkStats;
 use App\Enums\LinkTypeEnum;
 use App\Models\Link;
 use Illuminate\Http\RedirectResponse;
@@ -35,27 +36,14 @@ class LinkController extends Controller
         };
     }
 
-    public function stats(string $shortCode): View
+    public function stats(string $shortCode, GetLinkStats $getLinkStats): View
     {
-        $link = Link::query()
-            ->where('short_code', $shortCode)
-            ->with(['visits' => fn ($query) => $query->latest()])
-            ->firstOrFail();
+        $link = Link::query()->where('short_code', $shortCode)->firstOrFail();
 
         if (! $link->is_public_stats && Auth::id() !== $link->user_id) {
             abort(403);
         }
 
-        $visits = $link->visits;
-        $totalVisits = $visits->count();
-
-        return view('links.stats', [
-            'link' => $link,
-            'visits' => $visits,
-            'totalVisits' => $totalVisits,
-            'byDevice' => $visits->groupBy('device_type')->map->count()->sortDesc(),
-            'byBrowser' => $visits->groupBy('browser')->map->count()->sortDesc(),
-            'byOs' => $visits->groupBy('os')->map->count()->sortDesc(),
-        ]);
+        return view('links.stats', $getLinkStats->handle($link));
     }
 }

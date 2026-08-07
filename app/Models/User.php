@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
 
-#[Fillable(['mobile', 'registration_ip'])]
-#[Hidden(['remember_token'])]
+#[Fillable(['mobile', 'registration_ip', 'api_token'])]
+#[Hidden(['remember_token', 'api_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -30,5 +31,25 @@ class User extends Authenticatable
     public function links(): HasMany
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function ensureApiToken(): string
+    {
+        if (is_string($this->api_token) && $this->api_token !== '') {
+            return $this->api_token;
+        }
+
+        return $this->regenerateApiToken();
+    }
+
+    public function regenerateApiToken(): string
+    {
+        do {
+            $token = Str::random(64);
+        } while (static::query()->where('api_token', $token)->exists());
+
+        $this->forceFill(['api_token' => $token])->save();
+
+        return $token;
     }
 }

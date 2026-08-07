@@ -1,1 +1,2 @@
-// for Flexilla Only 
+// for Flexilla Only
+import './sidebar-plugin.js';
