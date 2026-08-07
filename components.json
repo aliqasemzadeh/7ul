@@ -39,6 +39,31 @@
             "name": "icon",
             "namespace": "@flexiwind",
             "version": "1.0.0"
+        },
+        {
+            "name": "select",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "checkbox",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "ui-helper",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "card",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "textarea",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
         }
     ]
 }
