@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('link_visits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('link_id')->constrained()->cascadeOnDelete()->index();
+            $table->foreignId('link_id')->constrained()->cascadeOnDelete();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->string('device_type')->nullable()->index();

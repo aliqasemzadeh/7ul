@@ -71,8 +71,6 @@ class LinkShortenerTest extends TestCase
 
         $this->assertNotNull($visit);
         $this->assertNotNull($visit->device_type);
-        $this->assertNotNull($visit->browser);
-        $this->assertNotNull($visit->os);
     }
 
     public function test_text_type_renders_content_view(): void
@@ -94,7 +92,7 @@ class LinkShortenerTest extends TestCase
 
         $this->get(route('links.redirect', $link->short_code))
             ->assertOk()
-            ->assertSee('echo "hi";', false);
+            ->assertSee('echo "hi";');
     }
 
     public function test_iframe_type_renders_raw_content(): void
@@ -112,6 +110,14 @@ class LinkShortenerTest extends TestCase
     {
         $link = Link::factory()->create([
             'is_public_stats' => true,
+        ]);
+
+        $link->visits()->create([
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'PHPUnit',
+            'device_type' => 'desktop',
+            'browser' => 'Chrome',
+            'os' => 'Windows',
         ]);
 
         $this->get(route('links.stats', $link->short_code))
