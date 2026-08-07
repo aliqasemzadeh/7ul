@@ -64,6 +64,37 @@
             "name": "textarea",
             "namespace": "flexiwind",
             "version": "1.0.0"
+        },
+        {
+            "name": "button",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "icon",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
+        },
+        {
+            "name": "sidebar-wrapper",
+            "namespace": "flexiwind",
+            "version": "1.0.0",
+            "guides": [
+                "Wrap your sidebar markup with <x-ui.sidebar-wrapper> to get open/close toggle behaviour.",
+                "Import resources/js/sidebar-plugin.js in your Vite entry point (e.g. app.js) to activate the sidebar plugin.",
+                "Add data-toggle-sidebar to any button that should open/close the sidebar on mobile."
+            ]
+        },
+        {
+            "name": "sidebar01",
+            "namespace": "flexiwind",
+            "version": "1.0.0",
+            "guides": [
+                "Include <x-layouts.sidebar> at the top level of your page \u2014 it renders as a fixed left panel.",
+                "Use <x-atoms.sidebar-item> inside the sidebar nav for each link (accepts href, icon, text, isActive).",
+                "Place <x-layouts.wrapper> after the sidebar; it offsets by md:pl-64 and holds your header + content.",
+                "Add data-toggle-sidebar to your mobile menu button inside <x-layouts.wrapper> to open the sidebar."
+            ]
         }
     ]
 }
