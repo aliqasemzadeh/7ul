@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Spatie\OneTimePasswords\Enums\ConsumeOneTimePasswordResult;
 
@@ -18,10 +17,8 @@ new #[Layout('components.layouts.base', [
 {
     public string $step = 'mobile';
 
-    #[Validate('required|string|regex:/^09\\d{9}$/')]
     public string $mobile = '';
 
-    #[Validate('required|string|size:6')]
     public string $otp = '';
 
     public string $statusMessage = '';
@@ -40,8 +37,36 @@ new #[Layout('components.layouts.base', [
         $view->title(__('app.auth.login_title'));
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
+    public function rules(): array
+    {
+        return [
+            'mobile' => ['required', 'string', 'regex:/^09\d{9}$/'],
+            'otp' => ['required', 'string', 'size:6'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'mobile.required' => __('app.auth.mobile_required'),
+            'mobile.regex' => __('app.auth.mobile_invalid'),
+        ];
+    }
+
+    public function updatedMobile(string $value): void
+    {
+        $this->mobile = $this->normalizeIranianMobile($value);
+    }
+
     public function sendCode(SendMobileOtp $sendMobileOtp): void
     {
+        $this->mobile = $this->normalizeIranianMobile($this->mobile);
         $this->validateOnly('mobile');
         $this->ensureIsNotRateLimited();
 
@@ -141,6 +166,17 @@ new #[Layout('components.layouts.base', [
             default => __('one-time-passwords::validation.incorrect_one_time_password'),
         };
     }
+
+    protected function normalizeIranianMobile(string $mobile): string
+    {
+        $mobile = str_replace(
+            ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'],
+            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            $mobile,
+        );
+
+        return preg_replace('/\D+/', '', $mobile) ?? '';
+    }
 };
 ?>
 
@@ -191,10 +227,12 @@ new #[Layout('components.layouts.base', [
                             name="mobile"
                             inputmode="numeric"
                             autocomplete="tel"
+                            maxlength="11"
+                            pattern="09[0-9]{9}"
                             dir="ltr"
                             :label="__('app.auth.mobile')"
                             :placeholder="__('app.auth.mobile_placeholder')"
-                            wire:model="mobile"
+                            wire:model.live="mobile"
                             :invalid="$errors->has('mobile')"
                             class="w-full"
                         />

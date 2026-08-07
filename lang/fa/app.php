@@ -49,6 +49,8 @@ return [
         'otp_subtitle' => 'کد ۶ رقمی ارسال‌شده به :mobile را وارد کنید.',
         'mobile' => 'شماره موبایل',
         'mobile_placeholder' => '09121234567',
+        'mobile_invalid' => 'شماره موبایل باید ایرانی و با فرمت ۰۹XXXXXXXXX باشد.',
+        'mobile_required' => 'وارد کردن شماره موبایل الزامی است.',
         'otp' => 'کد تایید',
         'otp_placeholder' => '------',
         'send_code' => 'ارسال کد',

@@ -49,6 +49,8 @@ return [
         'otp_subtitle' => 'Enter the 6-digit code sent to :mobile.',
         'mobile' => 'Mobile number',
         'mobile_placeholder' => '09121234567',
+        'mobile_invalid' => 'Mobile number must be Iranian and in the 09XXXXXXXXX format.',
+        'mobile_required' => 'Mobile number is required.',
         'otp' => 'Verification code',
         'otp_placeholder' => '------',
         'send_code' => 'Send code',
