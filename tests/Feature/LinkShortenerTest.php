@@ -66,7 +66,7 @@ class LinkShortenerTest extends TestCase
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
-            ->test('pages::user.index')
+            ->test('pages::user.create')
             ->set('destination', 'Hello professional text')
             ->set('type', LinkTypeEnum::Text->value)
             ->set('isPublic', false)
@@ -88,7 +88,7 @@ class LinkShortenerTest extends TestCase
         $user = User::factory()->create();
 
         Livewire::actingAs($user)
-            ->test('pages::user.index')
+            ->test('pages::user.create')
             ->set('destination', '')
             ->call('generateShortLink')
             ->assertHasErrors(['destination']);
