@@ -91,6 +91,40 @@ $response = $client->post(config('app.url').'/api/v1/links', [
 $link = json_decode($response->getBody()->getContents(), true);
 PHP;
 
+    $pythonExample = <<<PYTHON
+import requests
+
+response = requests.get('{$baseUrl}/links', headers={
+    'Authorization': 'Bearer YOUR_API_TOKEN',
+    'Accept': 'application/json',
+})
+print(response.json())
+PYTHON;
+
+    $nodeExample = <<<JS
+const axios = require('axios');
+
+const response = await axios.get('{$baseUrl}/links', {
+    headers: {
+        'Authorization': 'Bearer YOUR_API_TOKEN',
+        'Accept': 'application/json'
+    }
+});
+console.log(response.data);
+JS;
+
+    $aspnetExample = <<<CS
+using System.Net.Http.Headers;
+
+var client = new HttpClient();
+client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "YOUR_API_TOKEN");
+client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+var response = await client.GetAsync("{$baseUrl}/links");
+var data = await response.Content.ReadAsStringAsync();
+Console.WriteLine(data);
+CS;
+
     $aiSkill = <<<SKILL
 ---
 name: sevenup-link-api
@@ -274,6 +308,70 @@ SKILL;
         <div class="space-y-3">
             <h4 class="text-sm font-semibold text-fg-title">POST — PHP</h4>
             <pre class="overflow-x-auto rounded-ui border border-border bg-bg-subtle p-4 text-xs" dir="ltr">{{ $phpPostExample }}</pre>
+        </div>
+
+        <div class="space-y-3">
+            <h4 class="text-sm font-semibold text-fg-title">GET — Python</h4>
+            <pre class="overflow-x-auto rounded-ui border border-border bg-bg-subtle p-4 text-xs" dir="ltr">{{ $pythonExample }}</pre>
+        </div>
+
+        <div class="space-y-3">
+            <h4 class="text-sm font-semibold text-fg-title">GET — Node.js</h4>
+            <pre class="overflow-x-auto rounded-ui border border-border bg-bg-subtle p-4 text-xs" dir="ltr">{{ $nodeExample }}</pre>
+        </div>
+
+        <div class="space-y-3">
+            <h4 class="text-sm font-semibold text-fg-title">GET — ASP.NET</h4>
+            <pre class="overflow-x-auto rounded-ui border border-border bg-bg-subtle p-4 text-xs" dir="ltr">{{ $aspnetExample }}</pre>
+        </div>
+    </x-ui.card>
+
+    <x-ui.card class="space-y-4 p-(--card-padding)" :shadow="true" x-data="{
+        method: 'GET',
+        body: '{\"destination\":\"https://example.com\",\"type\":\"link\",\"is_public_stats\":true}',
+        loading: false,
+        response: null,
+        apiToken: '{{ $apiToken }}',
+        async runRequest() {
+            this.loading = true;
+            this.response = null;
+            try {
+                const options = {
+                    method: this.method,
+                    headers: {
+                        'Authorization': `Bearer ${this.apiToken}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                };
+                if (this.method === 'POST') {
+                    options.body = this.body;
+                }
+                const res = await fetch('/api/v1/links', options);
+                this.response = await res.json();
+            } catch (e) {
+                this.response = { error: e.message };
+            } finally {
+                this.loading = false;
+            }
+        }
+    }">
+        <h3 class="text-lg font-bold text-fg-title">{{ __('app.panel.api.tester_heading') }}</h3>
+        <div class="space-y-3">
+            <x-ui.select label="Endpoint" x-model="method">
+                <option value="GET">GET /links</option>
+                <option value="POST">POST /links</option>
+            </x-ui.select>
+            <div x-show="method === 'POST'">
+                <x-ui.textarea x-model="body" label="Request Body (JSON)" class="w-full" />
+            </div>
+            <x-ui.button x-on:click="runRequest" :disabled="loading">
+                <span x-show="!loading">Send Request</span>
+                <span x-show="loading">...</span>
+            </x-ui.button>
+            <div x-show="response" class="overflow-x-auto">
+                <pre class="bg-bg-subtle p-4 rounded-ui text-xs text-fg-title" x-text="JSON.stringify(response, null, 2)"></pre>
+            </div>
         </div>
     </x-ui.card>
 
