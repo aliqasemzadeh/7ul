@@ -365,7 +365,7 @@ SKILL;
             <div x-show="method === 'POST'">
                 <x-ui.textarea x-model="body" label="Request Body (JSON)" class="w-full" />
             </div>
-            <x-ui.button x-on:click="runRequest" :disabled="loading">
+            <x-ui.button x-on:click="runRequest" disabled="false" x-bind:disabled="loading">
                 <span x-show="!loading">Send Request</span>
                 <span x-show="loading">...</span>
             </x-ui.button>
