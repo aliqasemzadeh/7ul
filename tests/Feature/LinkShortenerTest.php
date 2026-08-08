@@ -37,7 +37,8 @@ class LinkShortenerTest extends TestCase
             ->set('url', 'https://example.com/path')
             ->call('shorten')
             ->assertHasNoErrors()
-            ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')));
+            ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')))
+            ->assertSet('qrCodeDataUri', fn (?string $qrCodeDataUri): bool => is_string($qrCodeDataUri) && str_starts_with($qrCodeDataUri, 'data:image/svg+xml'));
 
         $link = Link::query()->first();
 
@@ -72,7 +73,8 @@ class LinkShortenerTest extends TestCase
             ->set('isPublic', false)
             ->call('generateShortLink')
             ->assertHasNoErrors()
-            ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')));
+            ->assertSet('shortLink', fn (?string $shortLink): bool => is_string($shortLink) && str_contains($shortLink, url('/')))
+            ->assertSet('qrCodeDataUri', fn (?string $qrCodeDataUri): bool => is_string($qrCodeDataUri) && str_starts_with($qrCodeDataUri, 'data:image/svg+xml'));
 
         $link = Link::query()->first();
 
