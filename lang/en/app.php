@@ -159,6 +159,7 @@ return [
             ],
             'skill_heading' => 'AI skill',
             'copy_skill' => 'Copy skill',
+            'tester_heading' => 'API Tester',
             'examples_heading' => 'Code samples',
             'logs_heading' => 'Login logs',
             'logs_subtitle' => 'Authentication history for your account.',

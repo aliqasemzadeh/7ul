@@ -159,6 +159,7 @@ return [
             ],
             'skill_heading' => 'مهارت هوش مصنوعی (Skill)',
             'copy_skill' => 'کپی Skill',
+            'tester_heading' => 'تست‌کننده API',
             'examples_heading' => 'نمونه‌کد',
             'logs_heading' => 'لاگ ورود',
             'logs_subtitle' => 'تاریخچه ورودهای ثبت‌شده برای حساب شما.',
