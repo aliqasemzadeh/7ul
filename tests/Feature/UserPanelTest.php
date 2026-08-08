@@ -102,4 +102,18 @@ class UserPanelTest extends TestCase
         $this->assertNotSame($original, $user->api_token);
         $component->assertSet('apiToken', $user->api_token);
     }
+
+    public function test_api_page_loads_with_examples_and_tester(): void
+    {
+        $user = User::factory()->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::user.api')
+            ->assertOk()
+            ->assertSee(__('app.panel.api.tester_heading'))
+            ->assertSee(__('app.panel.api.examples_heading'))
+            ->assertSee('GET — Python')
+            ->assertSee('GET — Node.js')
+            ->assertSee('GET — ASP.NET');
+    }
 }

@@ -326,12 +326,12 @@ SKILL;
         </div>
     </x-ui.card>
 
-    <x-ui.card class="space-y-4 p-(--card-padding)" :shadow="true" x-data="{
-        method: 'GET',
-        body: '{\"destination\":\"https://example.com\",\"type\":\"link\",\"is_public_stats\":true}',
+    <x-ui.card class="space-y-4 p-(--card-padding)" :shadow="true" x-data='{
+        method: "GET",
+        body: "{\"destination\":\"https://example.com\",\"type\":\"link\",\"is_public_stats\":true}",
         loading: false,
         response: null,
-        apiToken: '{{ $apiToken }}',
+        apiToken: "{{ $apiToken }}",
         async runRequest() {
             this.loading = true;
             this.response = null;
@@ -339,15 +339,15 @@ SKILL;
                 const options = {
                     method: this.method,
                     headers: {
-                        'Authorization': `Bearer ${this.apiToken}`,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        "Authorization": `Bearer ${this.apiToken}`,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
                     }
                 };
-                if (this.method === 'POST') {
+                if (this.method === "POST") {
                     options.body = this.body;
                 }
-                const res = await fetch('/api/v1/links', options);
+                const res = await fetch("/api/v1/links", options);
                 this.response = await res.json();
             } catch (e) {
                 this.response = { error: e.message };
@@ -355,7 +355,7 @@ SKILL;
                 this.loading = false;
             }
         }
-    }">
+    }'>
         <h3 class="text-lg font-bold text-fg-title">{{ __('app.panel.api.tester_heading') }}</h3>
         <div class="space-y-3">
             <x-ui.select label="Endpoint" x-model="method">
