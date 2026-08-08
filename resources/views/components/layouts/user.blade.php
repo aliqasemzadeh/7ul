@@ -40,7 +40,7 @@
     class="bg-bg text-fg min-h-screen font-sans antialiased"
 >
     <x-ui.sidebar-wrapper
-        class="fixed inset-y-0 start-0 z-80 flex h-dvh w-11/12 max-w-64 flex-col justify-between overflow-hidden border-e border-bg-muted/70 bg-bg-surface px-4 py-3 transition-all ease-linear ltr:-translate-x-full rtl:translate-x-full fx-open:translate-x-0 md:w-64 md:translate-x-0 md:transition-none"
+        class="fixed inset-y-0 start-0 z-80 flex h-dvh w-11/12 max-w-64 flex-col justify-between overflow-hidden border-e border-bg-muted/70 bg-bg-surface px-4 py-3 transition-all ease-linear max-md:ltr:-translate-x-full max-md:rtl:translate-x-full max-md:fx-open:translate-x-0 md:w-64 md:transition-none"
     >
         <div class="min-h-max border-b border-border py-2">
             <a href="{{ route('home') }}" class="flex items-center gap-x-3 font-semibold text-fg-title" wire:navigate>
