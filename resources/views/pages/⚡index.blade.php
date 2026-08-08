@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Links\CreateShortLink;
+use App\Actions\Links\GenerateLinkQrCode;
 use App\Enums\LinkTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -18,6 +19,8 @@ new #[Layout('components.layouts.base', [
 
     public ?string $shortCode = null;
 
+    public ?string $qrCodeDataUri = null;
+
     public function mount(): void
     {
         app()->setLocale('fa');
@@ -28,7 +31,7 @@ new #[Layout('components.layouts.base', [
         $view->title(__('app.welcome.title'));
     }
 
-    public function shorten(CreateShortLink $createShortLink): void
+    public function shorten(CreateShortLink $createShortLink, GenerateLinkQrCode $generateLinkQrCode): void
     {
         if (! Auth::check()) {
             $this->redirect(route('login'), navigate: true);
@@ -53,6 +56,7 @@ new #[Layout('components.layouts.base', [
 
         $this->shortCode = $link->short_code;
         $this->shortLink = url('/'.$link->short_code);
+        $this->qrCodeDataUri = $generateLinkQrCode->handle($this->shortLink);
     }
 };
 ?>
@@ -161,6 +165,30 @@ new #[Layout('components.layouts.base', [
                     <p class="mt-2 break-all font-semibold text-fg-title" dir="ltr" x-ref="shortLink">
                         {{ $shortLink }}
                     </p>
+
+                    @if ($qrCodeDataUri)
+                        <div class="mt-4 flex flex-col items-center gap-3 border-t border-border pt-4">
+                            <p class="text-sm font-medium text-fg-muted">{{ __('app.welcome.qr_label') }}</p>
+                            <img
+                                src="{{ $qrCodeDataUri }}"
+                                alt="{{ __('app.welcome.qr_label') }}"
+                                class="size-48 rounded-ui bg-white p-2"
+                                width="192"
+                                height="192"
+                            />
+                            <x-ui.button
+                                :href="$qrCodeDataUri"
+                                download="7ul-{{ $shortCode }}.svg"
+                                variant="outline"
+                                size="md"
+                                class="w-full justify-center sm:w-auto"
+                                :in-same-window="true"
+                            >
+                                {{ __('app.welcome.download_qr') }}
+                            </x-ui.button>
+                        </div>
+                    @endif
+
                     <div class="mt-4 flex flex-col gap-2 sm:flex-row">
                         <x-ui.button
                             type="button"

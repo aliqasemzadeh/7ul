@@ -17,6 +17,8 @@ return [
         'copy' => 'کپی لینک',
         'copied' => 'کپی شد!',
         'view_stats' => 'مشاهده آمار',
+        'qr_label' => 'کد QR',
+        'download_qr' => 'دانلود QR',
         'terms' => 'با استفاده از خدمات ما، شما :terms ما را می‌پذیرید.',
         'terms_link' => 'قوانین و مقررات',
         'nav' => [
@@ -84,6 +86,8 @@ return [
         'copy' => 'کپی لینک',
         'copied' => 'کپی شد!',
         'view_stats' => 'مشاهده آمار',
+        'qr_label' => 'کد QR',
+        'download_qr' => 'دانلود QR',
         'logout' => 'خروج',
         'content_title' => 'محتوای لینک | 7UL.ir',
         'stats_title' => 'آمار :code | 7UL.ir',

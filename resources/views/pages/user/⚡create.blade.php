@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Links\CreateShortLink;
+use App\Actions\Links\GenerateLinkQrCode;
 use App\Enums\LinkTypeEnum;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -19,12 +20,14 @@ new #[Layout('components.layouts.user')] class extends Component
 
     public ?string $shortCode = null;
 
+    public ?string $qrCodeDataUri = null;
+
     public function rendering($view): void
     {
         $view->title(__('app.panel.create.title'));
     }
 
-    public function generateShortLink(CreateShortLink $createShortLink): void
+    public function generateShortLink(CreateShortLink $createShortLink, GenerateLinkQrCode $generateLinkQrCode): void
     {
         $validated = $this->validate([
             'destination' => ['required', 'string'],
@@ -44,6 +47,7 @@ new #[Layout('components.layouts.user')] class extends Component
 
         $this->shortCode = $link->short_code;
         $this->shortLink = url('/'.$link->short_code);
+        $this->qrCodeDataUri = $generateLinkQrCode->handle($this->shortLink);
     }
 };
 ?>
@@ -114,6 +118,29 @@ new #[Layout('components.layouts.user')] class extends Component
                     {{ $shortLink }}
                 </p>
             </div>
+
+            @if ($qrCodeDataUri)
+                <div class="flex flex-col items-center gap-3 border-t border-border pt-4">
+                    <p class="text-sm font-medium text-fg-muted">{{ __('app.shortener.qr_label') }}</p>
+                    <img
+                        src="{{ $qrCodeDataUri }}"
+                        alt="{{ __('app.shortener.qr_label') }}"
+                        class="size-48 rounded-ui bg-white p-2"
+                        width="192"
+                        height="192"
+                    />
+                    <x-ui.button
+                        :href="$qrCodeDataUri"
+                        download="7ul-{{ $shortCode }}.svg"
+                        variant="outline"
+                        size="md"
+                        class="w-full justify-center sm:w-auto"
+                        :in-same-window="true"
+                    >
+                        {{ __('app.shortener.download_qr') }}
+                    </x-ui.button>
+                </div>
+            @endif
 
             <div class="flex flex-col gap-2 sm:flex-row" x-data="{ copied: false }">
                 <x-ui.button

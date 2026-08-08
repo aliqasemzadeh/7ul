@@ -17,6 +17,8 @@ return [
         'copy' => 'Copy link',
         'copied' => 'Copied!',
         'view_stats' => 'View stats',
+        'qr_label' => 'QR code',
+        'download_qr' => 'Download QR',
         'terms' => 'By using our service, you agree to our :terms.',
         'terms_link' => 'Terms of Service',
         'nav' => [
@@ -84,6 +86,8 @@ return [
         'copy' => 'Copy link',
         'copied' => 'Copied!',
         'view_stats' => 'View stats',
+        'qr_label' => 'QR code',
+        'download_qr' => 'Download QR',
         'logout' => 'Log out',
         'content_title' => 'Link content | 7UL.ir',
         'stats_title' => 'Stats :code | 7UL.ir',
