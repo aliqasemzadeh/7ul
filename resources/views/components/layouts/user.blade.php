@@ -105,7 +105,7 @@
         </div>
     </x-ui.sidebar-wrapper>
 
-    <main class="min-h-screen md:ps-64">
+    <main class="min-h-screen w-full min-w-0 overflow-x-hidden md:ps-64">
         <header class="sticky top-0 z-35 flex h-16 w-full bg-bg/90 backdrop-blur">
             <div class="flex h-full w-full items-center justify-between px-4 sm:px-8">
                 <div class="flex items-center gap-3">
@@ -126,7 +126,7 @@
             </div>
         </header>
 
-        <div class="px-4 pb-10 pt-2 sm:px-8">
+        <div class="min-w-0 px-4 pb-10 pt-2 sm:px-8">
             {{ $slot }}
         </div>
     </main>

@@ -76,69 +76,74 @@ new #[Layout('components.layouts.user')] class extends Component
     </x-ui.card>
 
     <x-ui.card class="overflow-hidden p-0" :shadow="true">
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="border-b border-border bg-bg-subtle text-fg-muted">
-                    <tr>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.panel.links.short_link') }}</th>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.shortener.type') }}</th>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.panel.links.destination') }}</th>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.shortener.total_visits') }}</th>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.panel.links.created_at') }}</th>
-                        <th class="px-4 py-3 text-start font-medium">{{ __('app.panel.links.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($this->links as $link)
-                        <tr class="border-b border-border last:border-0" wire:key="link-{{ $link->id }}">
-                            <td class="px-4 py-3 font-semibold text-fg-title" dir="ltr">
-                                {{ url('/'.$link->short_code) }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">{{ $link->type->label() }}</td>
-                            <td class="max-w-56 truncate px-4 py-3 text-fg-muted" title="{{ $link->destination }}">
-                                {{ $link->destination }}
-                            </td>
-                            <td class="px-4 py-3 font-semibold">{{ number_format($link->visits_count) }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap" dir="ltr">
-                                {{ $this->formatJalali($link->created_at) }}
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex flex-wrap gap-2" x-data="{ copied: false }">
-                                    <x-ui.button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        x-on:click="
-                                            navigator.clipboard.writeText(@js(url('/'.$link->short_code)));
-                                            copied = true;
-                                            setTimeout(() => copied = false, 2000);
-                                        "
-                                    >
-                                        <span x-show="!copied">{{ __('app.shortener.copy') }}</span>
-                                        <span x-cloak x-show="copied">{{ __('app.shortener.copied') }}</span>
-                                    </x-ui.button>
+        <x-ui.table striped hoverable>
+            <x-ui.table.columns wrapper="bg-bg-subtle border-b border-border text-fg-muted [--gutter-x:--spacing(4)] [--gutter-y:--spacing(3)]">
+                <x-ui.table.column class="!text-start">{{ __('app.panel.links.short_link') }}</x-ui.table.column>
+                <x-ui.table.column class="!text-start">{{ __('app.shortener.type') }}</x-ui.table.column>
+                <x-ui.table.column class="!text-start">{{ __('app.panel.links.destination') }}</x-ui.table.column>
+                <x-ui.table.column class="!text-start">{{ __('app.shortener.total_visits') }}</x-ui.table.column>
+                <x-ui.table.column class="!text-start">{{ __('app.panel.links.created_at') }}</x-ui.table.column>
+                <x-ui.table.column class="!text-start">{{ __('app.panel.links.actions') }}</x-ui.table.column>
+            </x-ui.table.columns>
 
-                                    <x-ui.button
-                                        :href="route('user.links.stats', $link->short_code)"
-                                        size="sm"
-                                        variant="outline"
-                                        wire:navigate
-                                    >
-                                        {{ __('app.shortener.view_stats') }}
-                                    </x-ui.button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-4 py-10 text-center text-fg-muted">
-                                {{ __('app.panel.links.empty') }}
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+            <x-ui.table.rows class="[--gutter-x:--spacing(4)] [--gutter-y:--spacing(3)]">
+                @forelse ($this->links as $link)
+                    <x-ui.table.row wire:key="link-{{ $link->id }}">
+                        <x-ui.table.cell class="!text-start font-semibold text-fg-title" dir="ltr">
+                            {{ url('/'.$link->short_code) }}
+                        </x-ui.table.cell>
+                        <x-ui.table.cell class="!text-start">{{ $link->type->label() }}</x-ui.table.cell>
+                        <x-ui.table.cell
+                            class="!text-start max-w-56 truncate text-fg-muted"
+                            title="{{ $link->destination }}"
+                        >
+                            {{ $link->destination }}
+                        </x-ui.table.cell>
+                        <x-ui.table.cell class="!text-start font-semibold">{{ number_format($link->visits_count) }}</x-ui.table.cell>
+                        <x-ui.table.cell class="!text-start" dir="ltr">
+                            {{ $this->formatJalali($link->created_at) }}
+                        </x-ui.table.cell>
+                        <x-ui.table.cell class="!text-start" white-space="normal">
+                            <div class="flex flex-wrap gap-2" x-data="{ copied: false }">
+                                <x-ui.button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    x-on:click="
+                                        navigator.clipboard.writeText(@js(url('/'.$link->short_code)));
+                                        copied = true;
+                                        setTimeout(() => copied = false, 2000);
+                                    "
+                                >
+                                    <span x-show="!copied">{{ __('app.shortener.copy') }}</span>
+                                    <span x-cloak x-show="copied">{{ __('app.shortener.copied') }}</span>
+                                </x-ui.button>
+
+                                <x-ui.button
+                                    :href="route('user.links.stats', $link->short_code)"
+                                    size="sm"
+                                    variant="outline"
+                                    wire:navigate
+                                >
+                                    {{ __('app.shortener.view_stats') }}
+                                </x-ui.button>
+                            </div>
+                        </x-ui.table.cell>
+                    </x-ui.table.row>
+                @empty
+                    <x-ui.table.row>
+                        <x-ui.table.cell
+                            colspan="6"
+                            white-space="normal"
+                            align="center"
+                            class="py-10 text-fg-muted"
+                        >
+                            {{ __('app.panel.links.empty') }}
+                        </x-ui.table.cell>
+                    </x-ui.table.row>
+                @endforelse
+            </x-ui.table.rows>
+        </x-ui.table>
 
         @if ($this->links->hasPages())
             <div class="border-t border-border px-4 py-3">

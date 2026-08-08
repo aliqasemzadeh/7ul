@@ -100,6 +100,11 @@
             "name": "pagination",
             "namespace": "flexiwind",
             "version": "1.0.0"
+        },
+        {
+            "name": "table",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
         }
     ]
 }
