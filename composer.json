@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.4",
         "drpshtiwan/livewire-async-select": "^3.3",
+        "endroid/qr-code": "^6.1",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
