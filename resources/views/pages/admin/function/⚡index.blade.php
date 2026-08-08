@@ -1,13 +1,17 @@
 <?php
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new class extends Component
+new #[Layout('components.layouts.admin')] class extends Component
 {
-    //
+    public function rendering($view): void
+    {
+        $view->title(__('app.admin.nav.functions').' | 7UL.ir');
+    }
 };
 ?>
 
-<div>
-    {{-- It always seems impossible until it is done. - Nelson Mandela --}}
+<div class="space-y-2">
+    <h2 class="text-2xl font-black text-fg-title">{{ __('app.admin.nav.functions') }}</h2>
 </div>

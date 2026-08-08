@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@flexilla/auto-resize-area": "^2.1.2",
+        "@flexilla/offcanvas": "^2.2.3",
         "@flexilla/utilities": "^2.5.5",
         "vazirmatn": "^33.0.3"
     }

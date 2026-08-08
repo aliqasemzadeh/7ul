@@ -94,6 +94,11 @@
             "name": "table",
             "namespace": "flexiwind",
             "version": "1.0.0"
+        },
+        {
+            "name": "slideover",
+            "namespace": "flexiwind",
+            "version": "1.0.0"
         }
     ]
 }
