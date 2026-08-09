@@ -1,5 +1,6 @@
 @props([
     'showText' => true,
+    'forceTextVisible' => false,
     'size' => 'md',
     'href' => null,
     'text' => null,
@@ -19,6 +20,7 @@
     ];
     $sizeClasses = $sizes[$size] ?? $sizes['md'];
     $link = $href ?? url('/');
+    $textVisibility = $forceTextVisible ? '' : 'hidden sm:inline';
 @endphp
 
 <a href="{{ $link }}" {{ $attributes->class(['group flex items-center gap-3']) }}>
@@ -37,7 +39,7 @@
     @endif
 
     @if ($showText)
-        <span class="{{ $sizeClasses['text'] }} hidden font-black tracking-tight text-fg-title sm:inline">
+        <span class="{{ $sizeClasses['text'] }} {{ $textVisibility }} font-black tracking-tight text-fg-title">
             @if ($accent)
                 {{ $displayText }}
                 <span class="text-primary">{{ $accent }}</span>
