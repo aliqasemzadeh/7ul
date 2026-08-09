@@ -76,7 +76,7 @@ new #[Layout('components.layouts.admin')] class extends Component
                 <span>cache:clear</span>
             </x-ui.button>
             <x-ui.button variant="soft" intent="info" class="h-20 flex-col gap-2" wire:click="runCommand('route:clear')">
-                <span class="iconify icon-[hugeicons--route] size-6"></span>
+                <span class="iconify icon-[hugeicons--route-01] size-6"></span>
                 <span>route:clear</span>
             </x-ui.button>
             <x-ui.button variant="soft" intent="warning" class="h-20 flex-col gap-2" wire:click="runCommand('config:clear')">
