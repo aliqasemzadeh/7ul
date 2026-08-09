@@ -29,6 +29,8 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::livewire('/users', 'pages::admin.user.index')->name('users.index');
+        Route::livewire('/users/{user}/links', 'pages::admin.user.links')->name('users.links');
+        Route::livewire('/users/{user}/roles', 'pages::admin.user.roles')->name('users.roles');
         Route::livewire('/links', 'pages::admin.link.index')->name('links.index');
         Route::livewire('/functions', 'pages::admin.function.index')->name('functions.index');
         Route::livewire('/settings', 'pages::admin.setting.index')->name('settings.index');
