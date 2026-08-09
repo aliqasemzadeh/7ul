@@ -2,6 +2,7 @@
 
 use App\Actions\Links\CreateShortLink;
 use App\Enums\LinkTypeEnum;
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Livewire\Forms\Admin\LinkForm;
 use App\Models\Link;
 use App\Models\User;
@@ -14,6 +15,7 @@ use Morilog\Jalali\Jalalian;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
     use WithPagination;
 
     public LinkForm $form;

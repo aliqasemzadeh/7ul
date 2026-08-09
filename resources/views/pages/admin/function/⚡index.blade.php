@@ -1,13 +1,16 @@
 <?php
 
-use Livewire\Attributes\Layout;
-use Livewire\Component;
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Models\SystemActionLog;
 use App\Jobs\System\RunArtisanCommandJob;
 use App\Jobs\System\UpdateProjectJob;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
+
     public string $customCommand = '';
 
     public function rendering($view): void

@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
         ->where('shortCode', '[A-Za-z0-9]{8}')
         ->name('user.links.stats');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::livewire('/users', 'pages::admin.user.index')->name('users.index');
         Route::livewire('/users/{user}/links', 'pages::admin.user.links')->name('users.links');
         Route::livewire('/users/{user}/roles', 'pages::admin.user.roles')->name('users.roles');

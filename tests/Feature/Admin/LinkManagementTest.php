@@ -20,7 +20,7 @@ class LinkManagementTest extends TestCase
 
     public function test_authenticated_user_can_view_links_list(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $link = Link::factory()->create([
             'user_id' => $admin->id,
             'destination' => 'https://example.com/admin-list',
@@ -35,7 +35,7 @@ class LinkManagementTest extends TestCase
 
     public function test_authenticated_user_can_create_link(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $owner = User::factory()->create();
 
         Livewire::actingAs($admin)
@@ -58,7 +58,7 @@ class LinkManagementTest extends TestCase
 
     public function test_create_link_validates_destination(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.link.index')
@@ -71,7 +71,7 @@ class LinkManagementTest extends TestCase
 
     public function test_authenticated_user_can_update_link(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $owner = User::factory()->create();
         $link = Link::factory()->create([
             'user_id' => $admin->id,
@@ -100,7 +100,7 @@ class LinkManagementTest extends TestCase
 
     public function test_authenticated_user_can_delete_link(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $link = Link::factory()->create(['user_id' => $admin->id]);
 
         Livewire::actingAs($admin)
@@ -113,7 +113,7 @@ class LinkManagementTest extends TestCase
 
     public function test_links_can_be_searched_by_short_code(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $match = Link::factory()->create([
             'user_id' => $admin->id,
             'short_code' => 'Ab12Cd34',
@@ -134,7 +134,7 @@ class LinkManagementTest extends TestCase
 
     public function test_links_can_be_searched_by_owner_mobile(): void
     {
-        $admin = User::factory()->create(['mobile' => '09120000001']);
+        $admin = User::factory()->admin()->create(['mobile' => '09120000001']);
         $owner = User::factory()->create(['mobile' => '09129999999']);
         $match = Link::factory()->create([
             'user_id' => $owner->id,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -10,6 +11,7 @@ use Morilog\Jalali\Jalalian;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
     use WithPagination;
 
     public User $user;

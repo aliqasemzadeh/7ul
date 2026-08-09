@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends Factory<User>
@@ -23,5 +24,13 @@ class UserFactory extends Factory
             'registration_ip' => fake()->ipv4(),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $role = Role::findOrCreate('admin', 'web');
+            $user->assignRole($role);
+        });
     }
 }

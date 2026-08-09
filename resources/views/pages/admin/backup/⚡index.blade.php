@@ -1,11 +1,14 @@
 <?php
 
 use App\Jobs\System\RunBackupJob;
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
+
     public function rendering($view): void
     {
         $view->title(__('app.admin.nav.backups').' | 7UL.ir');

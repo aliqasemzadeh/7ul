@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Livewire\Forms\Admin\UserForm;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use Morilog\Jalali\Jalalian;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
     use WithPagination;
 
     public UserForm $form;

@@ -21,7 +21,7 @@ class SiteSettingsTest extends TestCase
 
     public function test_authenticated_user_can_view_settings_page(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.setting.index')
@@ -31,7 +31,7 @@ class SiteSettingsTest extends TestCase
 
     public function test_authenticated_user_can_update_site_settings(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.setting.index')
@@ -57,7 +57,7 @@ class SiteSettingsTest extends TestCase
 
     public function test_site_name_is_required(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.setting.index')
@@ -68,7 +68,7 @@ class SiteSettingsTest extends TestCase
 
     public function test_contact_email_must_be_valid(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.setting.index')
@@ -81,7 +81,7 @@ class SiteSettingsTest extends TestCase
     {
         Storage::fake('public');
 
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $logo = UploadedFile::fake()->image('logo.png', 120, 40);
 
         Livewire::actingAs($admin)

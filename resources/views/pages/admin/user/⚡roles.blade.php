@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -8,6 +9,8 @@ use Spatie\Permission\Models\Role;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
+
     public User $user;
 
     public string $selectedRole = '';

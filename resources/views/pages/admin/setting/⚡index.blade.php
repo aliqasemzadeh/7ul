@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\EnsuresUserIsAdmin;
 use App\Livewire\Forms\Admin\SiteSettingsForm;
 use App\Settings\SiteSettings;
 use Livewire\Attributes\Layout;
@@ -8,6 +9,7 @@ use Livewire\WithFileUploads;
 
 new #[Layout('components.layouts.admin')] class extends Component
 {
+    use EnsuresUserIsAdmin;
     use WithFileUploads;
 
     public SiteSettingsForm $form;

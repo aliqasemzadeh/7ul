@@ -20,7 +20,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_view_users_list(): void
     {
-        $admin = User::factory()->create(['mobile' => '09120000001']);
+        $admin = User::factory()->admin()->create(['mobile' => '09120000001']);
         $other = User::factory()->create(['mobile' => '09120000002']);
 
         Livewire::actingAs($admin)
@@ -32,7 +32,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_create_user(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.user.index')
@@ -47,7 +47,7 @@ class UserManagementTest extends TestCase
 
     public function test_create_user_validates_mobile_format(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.user.index')
@@ -59,7 +59,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_update_user(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create(['mobile' => '09121111111']);
 
         Livewire::actingAs($admin)
@@ -75,7 +75,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_delete_other_user(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create(['mobile' => '09123333333']);
 
         Livewire::actingAs($admin)
@@ -88,7 +88,7 @@ class UserManagementTest extends TestCase
 
     public function test_user_cannot_delete_themselves(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
 
         Livewire::actingAs($admin)
             ->test('pages::admin.user.index')
@@ -100,7 +100,7 @@ class UserManagementTest extends TestCase
 
     public function test_users_can_be_searched_by_mobile(): void
     {
-        $admin = User::factory()->create(['mobile' => '09120000001']);
+        $admin = User::factory()->admin()->create(['mobile' => '09120000001']);
         User::factory()->create(['mobile' => '09129999999']);
 
         Livewire::actingAs($admin)
@@ -119,7 +119,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_view_user_links_page(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create(['mobile' => '09124444444']);
         $link = Link::factory()->for($user)->create();
 
@@ -132,7 +132,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_delete_link_from_user_links_page(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create();
         $link = Link::factory()->for($user)->create();
 
@@ -153,7 +153,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_view_user_roles_page(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create(['mobile' => '09125555555']);
 
         $this->actingAs($admin)
@@ -164,7 +164,7 @@ class UserManagementTest extends TestCase
 
     public function test_authenticated_user_can_assign_and_remove_role(): void
     {
-        $admin = User::factory()->create();
+        $admin = User::factory()->admin()->create();
         $user = User::factory()->create();
         Role::create(['name' => 'editor', 'guard_name' => 'web']);
 

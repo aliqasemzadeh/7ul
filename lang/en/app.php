@@ -249,6 +249,7 @@ return [
             'links' => 'My links',
             'create' => 'Create link',
             'api' => 'API',
+            'admin' => 'Admin panel',
         ],
         'links' => [
             'title' => 'My links | 7UL.ir',

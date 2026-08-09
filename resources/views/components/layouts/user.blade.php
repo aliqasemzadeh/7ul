@@ -33,6 +33,16 @@
             'isActive' => $currentRoute === 'user.api',
         ],
     ];
+
+    if ($user?->hasRole('admin')) {
+        $items[] = [
+            'id' => 'admin',
+            'href' => route('admin.users.index'),
+            'text' => __('app.panel.nav.admin'),
+            'icon' => 'icon-[hugeicons--dashboard-square-01]',
+            'isActive' => is_string($currentRoute) && str_starts_with($currentRoute, 'admin.'),
+        ];
+    }
 @endphp
 
 <x-layouts.base
