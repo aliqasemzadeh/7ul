@@ -9,31 +9,40 @@ new class extends Component
     public function runBackup()
     {
         RunBackupJob::dispatch('database', 'local');
-        session()->flash('status', 'پشتیبان‌گیری در صف اجرا قرار گرفت.');
+
+        $this->dispatch('notify', message: __('app.admin.backups.dispatched'), type: 'success');
     }
 };
 ?>
 
-<div class="p-6">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold">پشتیبان‌گیری سیستم</h1>
-        <button wire:click="runBackup()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-            اجرای دستی پشتیبان‌گیری دیتابیس
-        </button>
-    </div>
-
-    @if (session('status'))
-        <div class="p-4 mb-4 text-green-700 bg-green-100 rounded">
-            {{ session('status') }}
+<x-layouts.admin :title="__('app.admin.nav.backups')">
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <x-ui.button wire:click="runBackup()" icon="icon-[hugeicons--database-02]">
+                {{ __('app.admin.backups.run_manual') }}
+            </x-ui.button>
         </div>
-    @endif
 
-    <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-lg font-semibold mb-4">تنظیمات فعلی</h2>
-        <ul class="space-y-2">
-            <li><strong>زمان‌بندی:</strong> هر روز ساعت ۰۶:۰۰</li>
-            <li><strong>نوع پشتیبان:</strong> فقط دیتابیس</li>
-            <li><strong>محل ذخیره:</strong> محلی (storage/app/private)</li>
-        </ul>
+        <div class="grid gap-6 sm:grid-cols-2">
+            <x-ui.card>
+                <div class="p-6">
+                    <h2 class="text-lg font-semibold text-fg-title mb-4">{{ __('app.admin.backups.current_config') }}</h2>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex justify-between">
+                            <span class="text-fg-muted">{{ __('app.admin.backups.schedule') }}:</span>
+                            <span class="font-medium text-fg-title">Every day at 06:00</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-fg-muted">{{ __('app.admin.backups.type') }}:</span>
+                            <span class="font-medium text-fg-title">Database</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-fg-muted">{{ __('app.admin.backups.destination') }}:</span>
+                            <span class="font-medium text-fg-title">Local (storage/app/private)</span>
+                        </li>
+                    </ul>
+                </div>
+            </x-ui.card>
+        </div>
     </div>
-</div>
+</x-layouts.admin>
