@@ -311,4 +311,10 @@ return [
             ],
         ],
     ],
+    'console' => [
+        'set_admin' => [
+            'ask_mobile' => 'Enter the admin user mobile number',
+            'success' => 'User :mobile has been set as admin.',
+        ],
+    ],
 ];
