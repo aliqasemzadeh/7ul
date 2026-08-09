@@ -16,7 +16,7 @@
             'href' => route('admin.users.index'),
             'text' => __('app.admin.nav.users'),
             'icon' => 'icon-[hugeicons--user-multiple]',
-            'isActive' => $currentRoute === 'admin.users.index',
+            'isActive' => in_array($currentRoute, ['admin.users.index', 'admin.users.links', 'admin.users.roles'], true),
         ],
         [
             'id' => 'links',

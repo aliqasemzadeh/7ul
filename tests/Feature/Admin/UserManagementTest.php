@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Link;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class UserManagementTest extends TestCase
@@ -106,5 +108,80 @@ class UserManagementTest extends TestCase
             ->set('search', '09129999999')
             ->assertSee('09129999999')
             ->assertDontSee('09120000001');
+    }
+
+    public function test_guests_are_redirected_from_user_links_page(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get(route('admin.users.links', $user))->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_can_view_user_links_page(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create(['mobile' => '09124444444']);
+        $link = Link::factory()->for($user)->create();
+
+        $this->actingAs($admin)
+            ->get(route('admin.users.links', $user))
+            ->assertOk()
+            ->assertSee($link->short_code)
+            ->assertSee(__('app.admin.users.links_heading'));
+    }
+
+    public function test_authenticated_user_can_delete_link_from_user_links_page(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+        $link = Link::factory()->for($user)->create();
+
+        Livewire::actingAs($admin)
+            ->test('pages::admin.user.links', ['user' => $user])
+            ->call('deleteLink', $link->id)
+            ->assertDispatched('notify');
+
+        $this->assertSoftDeleted($link);
+    }
+
+    public function test_guests_are_redirected_from_user_roles_page(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get(route('admin.users.roles', $user))->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_can_view_user_roles_page(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create(['mobile' => '09125555555']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.users.roles', $user))
+            ->assertOk()
+            ->assertSee(__('app.admin.users.roles_heading'));
+    }
+
+    public function test_authenticated_user_can_assign_and_remove_role(): void
+    {
+        $admin = User::factory()->create();
+        $user = User::factory()->create();
+        Role::create(['name' => 'editor', 'guard_name' => 'web']);
+
+        Livewire::actingAs($admin)
+            ->test('pages::admin.user.roles', ['user' => $user])
+            ->set('selectedRole', 'editor')
+            ->call('addRole')
+            ->assertHasNoErrors()
+            ->assertDispatched('notify');
+
+        $this->assertTrue($user->fresh()->hasRole('editor'));
+
+        Livewire::actingAs($admin)
+            ->test('pages::admin.user.roles', ['user' => $user])
+            ->call('removeRole', 'editor')
+            ->assertDispatched('notify');
+
+        $this->assertFalse($user->fresh()->hasRole('editor'));
     }
 }
