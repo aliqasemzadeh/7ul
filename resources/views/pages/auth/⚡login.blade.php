@@ -191,15 +191,12 @@ new #[Layout('components.layouts.base', [
     ></div>
 
     <header class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
-        <a href="{{ route('home') }}" wire:navigate class="group flex items-center gap-3">
-            <span class="flex size-10 items-center justify-center rounded-ui bg-primary text-lg font-black text-white shadow-sm transition duration-300 ease-out group-hover:scale-105">
-                {{ __('app.welcome.brand_short') }}
-            </span>
-            <span class="hidden text-xl font-black tracking-tight text-fg-title sm:inline">
-                Seven Up
-                <span class="text-primary">{{ __('app.welcome.brand_accent') }}</span>
-            </span>
-        </a>
+        <x-site.brand
+            :href="route('home')"
+            text="Seven Up"
+            :accent="__('app.welcome.brand_accent')"
+            wire:navigate
+        />
 
         <div class="flex items-center gap-3 sm:gap-4">
             <x-ui.theme-toggle />
@@ -209,7 +206,7 @@ new #[Layout('components.layouts.base', [
     <main class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 pb-16 pt-8 sm:px-8">
         <div class="animate-[modal-animation-in_0.5s_ease-out]">
             <p class="mb-3 text-sm font-semibold tracking-wide text-primary">
-                {{ __('app.welcome.brand') }}
+                {{ app(\App\Settings\SiteSettings::class)->site_name ?: __('app.welcome.brand') }}
             </p>
 
             @if ($step === 'mobile')

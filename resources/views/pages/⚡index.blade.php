@@ -73,17 +73,10 @@ new #[Layout('components.layouts.base', [
     ></div>
 
     <header class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
-        <a href="{{ url('/') }}" class="group flex items-center gap-3">
-            <span
-                class="flex size-10 items-center justify-center rounded-ui bg-primary text-lg font-black text-white shadow-sm transition duration-300 ease-out group-hover:scale-105"
-            >
-                {{ __('app.welcome.brand_short') }}
-            </span>
-            <span class="hidden text-xl font-black tracking-tight text-fg-title sm:inline">
-                Seven Up
-                <span class="text-primary">{{ __('app.welcome.brand_accent') }}</span>
-            </span>
-        </a>
+        <x-site.brand
+            text="Seven Up"
+            :accent="__('app.welcome.brand_accent')"
+        />
 
         @if (Route::has('login'))
             <nav class="flex items-center gap-2 sm:gap-3">
@@ -109,7 +102,7 @@ new #[Layout('components.layouts.base', [
         {{-- Hero: brand + headline + shortener only --}}
         <section class="mx-auto flex w-full max-w-3xl flex-col items-center text-center animate-[modal-animation-in_0.6s_ease-out]">
             <p class="mb-4 text-sm font-semibold tracking-wide text-primary">
-                {{ __('app.welcome.brand') }}
+                {{ app(\App\Settings\SiteSettings::class)->site_name ?: __('app.welcome.brand') }}
             </p>
 
             <h1 class="text-balance text-4xl font-black leading-tight text-fg-title sm:text-5xl lg:text-6xl">
@@ -277,23 +270,13 @@ new #[Layout('components.layouts.base', [
 
     <footer class="mx-auto mt-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 border-t border-border px-5 py-10 sm:flex-row sm:px-8 lg:px-10">
         <div class="flex flex-col items-center gap-2 sm:items-start">
-            <div class="flex items-center gap-2">
-                <span class="flex size-8 items-center justify-center rounded-ui bg-primary text-sm font-bold text-white">
-                    {{ __('app.welcome.brand_short') }}
-                </span>
-                <span class="font-bold text-fg-title">{{ __('app.welcome.brand') }}</span>
-            </div>
+            <x-site.brand size="sm" :show-text="true" :force-text-visible="true" />
             <p class="text-sm text-fg-muted">
                 {{ __('app.welcome.footer.rights') }}
                 &copy; {{ now()->year }}
             </p>
         </div>
 
-        <nav class="flex flex-wrap items-center justify-center gap-6 text-sm text-fg-muted">
-            <a href="#" class="transition hover:text-primary">{{ __('app.welcome.footer.about') }}</a>
-            <a href="#" class="transition hover:text-primary">{{ __('app.welcome.footer.contact') }}</a>
-            <a href="#" class="transition hover:text-primary">{{ __('app.welcome.footer.api') }}</a>
-            <a href="#" class="transition hover:text-primary">{{ __('app.welcome.footer.blog') }}</a>
-        </nav>
+        <x-site.contact-social />
     </footer>
 </div>
