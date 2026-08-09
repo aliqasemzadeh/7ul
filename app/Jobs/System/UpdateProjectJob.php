@@ -2,6 +2,7 @@
 
 namespace App\Jobs\System;
 
+use App\Models\SystemActionLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Artisan;
@@ -13,43 +14,73 @@ class UpdateProjectJob implements ShouldQueue
 {
     use Queueable;
 
+    protected ?SystemActionLog $log = null;
+    protected string $fullOutput = "";
+
     public function __construct(
         public bool $runComposer = true,
     ) {}
 
     public function handle(): void
     {
-        if (! $this->gitPull()) {
-            return;
-        }
+        $this->log = SystemActionLog::create([
+            'command' => 'project:update ' . ($this->runComposer ? '--with-composer' : '--quick'),
+            'status' => 'running',
+        ]);
 
-        if ($this->runComposer) {
-            $this->runComposerUpdate();
-        }
+        try {
+            if (! $this->gitPull()) {
+                $this->finishLog('failed');
+                return;
+            }
 
-        $this->runMigrations();
-        $this->clearCache();
-        $this->clearRoute();
-        $this->clearView();
-        $this->addTheme();
-        $this->restartQueue();
+            if ($this->runComposer) {
+                $this->runComposerUpdate();
+            }
+
+            $this->runMigrations();
+            $this->clearCache();
+            $this->clearRoute();
+            $this->clearView();
+            $this->addTheme();
+            $this->restartQueue();
+
+            $this->finishLog('success');
+        } catch (Throwable $e) {
+            $this->appendToOutput("\n\nCritical Error: " . $e->getMessage());
+            $this->finishLog('failed');
+        }
+    }
+
+    protected function appendToOutput(string $text): void
+    {
+        $this->fullOutput .= $text . "\n";
+        $this->log?->update(['output' => $this->fullOutput]);
+    }
+
+    protected function finishLog(string $status): void
+    {
+        $this->log?->update([
+            'output' => $this->fullOutput,
+            'status' => $status,
+        ]);
     }
 
     protected function gitPull(): bool
     {
-        Log::info('Starting project update (git pull)...');
+        $this->appendToOutput('Starting project update (git pull)...');
 
         $process = Process::forever()
             ->path(base_path())
             ->run('git pull');
 
         if ($process->successful()) {
-            Log::info("Git pull successful:\n".$process->output());
+            $this->appendToOutput("Git pull successful:\n".$process->output());
 
             return true;
         }
 
-        Log::error("Git pull failed:\n".$process->errorOutput());
+        $this->appendToOutput("Git pull failed:\n".$process->errorOutput());
 
         return false;
     }
@@ -61,7 +92,7 @@ class UpdateProjectJob implements ShouldQueue
 
     protected function runComposerUpdate(): void
     {
-        Log::info('Running composer install...');
+        $this->appendToOutput('Running composer install...');
 
         try {
             $process = Process::forever()
@@ -69,14 +100,14 @@ class UpdateProjectJob implements ShouldQueue
                 ->run($this->composerCommand().' install --no-dev --optimize-autoloader --no-interaction');
 
             if ($process->successful()) {
-                Log::info("Composer install successful:\n".$process->output());
+                $this->appendToOutput("Composer install successful:\n".$process->output());
 
                 return;
             }
 
-            Log::error("Composer install failed:\n".$process->errorOutput());
+            $this->appendToOutput("Composer install failed:\n".$process->errorOutput());
         } catch (Throwable $exception) {
-            Log::error('Composer install failed: '.$exception->getMessage());
+            $this->appendToOutput('Composer install failed: '.$exception->getMessage());
         }
     }
 
@@ -97,7 +128,7 @@ class UpdateProjectJob implements ShouldQueue
 
     protected function addTheme(): void
     {
-        Log::info('Building theme assets (npm run build)...');
+        $this->appendToOutput('Building theme assets (npm run build)...');
 
         try {
             $process = Process::forever()
@@ -105,14 +136,14 @@ class UpdateProjectJob implements ShouldQueue
                 ->run($this->npmCommand().' run build');
 
             if ($process->successful()) {
-                Log::info("Theme build successful:\n".$process->output());
+                $this->appendToOutput("Theme build successful:\n".$process->output());
 
                 return;
             }
 
-            Log::error("Theme build failed:\n".$process->errorOutput());
+            $this->appendToOutput("Theme build failed:\n".$process->errorOutput());
         } catch (Throwable $exception) {
-            Log::error('Theme build failed: '.$exception->getMessage());
+            $this->appendToOutput('Theme build failed: '.$exception->getMessage());
         }
     }
 
@@ -123,11 +154,11 @@ class UpdateProjectJob implements ShouldQueue
 
     protected function runArtisan(string $command, array $parameters = []): void
     {
-        Log::info("{$command}...");
+        $this->appendToOutput("Running artisan {$command}...");
 
         Artisan::call($command, $parameters);
 
-        Log::info("{$command}:\n".Artisan::output());
+        $this->appendToOutput("Artisan {$command} output:\n".Artisan::output());
     }
 
     protected function npmCommand(): string
