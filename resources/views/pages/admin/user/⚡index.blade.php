@@ -16,8 +16,14 @@ new #[Layout('components.layouts.admin')] class extends Component
 
     public UserForm $form;
 
+    public ?User $selectedUser = null;
+
     #[Url]
     public string $search = '';
+
+    protected $listeners = [
+        'user-links-updated' => '$refresh',
+    ];
 
     public function rendering($view): void
     {
@@ -56,6 +62,18 @@ new #[Layout('components.layouts.admin')] class extends Component
         $user = User::query()->findOrFail($userId);
         $this->form->setUser($user);
         $this->openFormSheet();
+    }
+
+    public function manageLinks(int $userId): void
+    {
+        $this->selectedUser = User::query()->findOrFail($userId);
+        $this->js("document.dispatchEvent(new CustomEvent('sheet:admin-user-links:open'))");
+    }
+
+    public function manageRoles(int $userId): void
+    {
+        $this->selectedUser = User::query()->findOrFail($userId);
+        $this->js("document.dispatchEvent(new CustomEvent('sheet:admin-user-roles:open'))");
     }
 
     public function save(): void
@@ -177,6 +195,28 @@ new #[Layout('components.layouts.admin')] class extends Component
                                 <x-ui.button
                                     type="button"
                                     size="sm"
+                                    variant="outline"
+                                    title="{{ __('app.admin.users.user_links') }}"
+                                    wire:click="manageLinks({{ $user->id }})"
+                                >
+                                    <span aria-hidden="true" class="iconify icon-[hugeicons--link-02] size-4"></span>
+                                    <span class="sr-only">{{ __('app.admin.users.user_links') }}</span>
+                                </x-ui.button>
+
+                                <x-ui.button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    title="{{ __('app.admin.users.user_roles') }}"
+                                    wire:click="manageRoles({{ $user->id }})"
+                                >
+                                    <span aria-hidden="true" class="iconify icon-[hugeicons--user-shield-02] size-4"></span>
+                                    <span class="sr-only">{{ __('app.admin.users.user_roles') }}</span>
+                                </x-ui.button>
+
+                                <x-ui.button
+                                    type="button"
+                                    size="sm"
                                     variant="ghost"
                                     intent="danger"
                                     title="{{ __('app.admin.users.delete') }}"
@@ -249,6 +289,44 @@ new #[Layout('components.layouts.admin')] class extends Component
                     </x-ui.button>
                 </x-ui.slideover.footer>
             </form>
+        </x-ui.slideover.content>
+    </x-ui.slideover>
+
+    <x-ui.slideover id="admin-user-links" position="right" size="md">
+        <x-ui.slideover.content>
+            <x-ui.slideover.header>
+                <x-ui.slideover.title>
+                    {{ __('app.admin.users.user_links') }}
+                    @if($selectedUser)
+                        <span class="text-sm font-normal text-fg-muted">({{ $selectedUser->mobile }})</span>
+                    @endif
+                </x-ui.slideover.title>
+            </x-ui.slideover.header>
+
+            <x-ui.slideover.body>
+                @if($selectedUser)
+                    @livewire('pages.admin.user.⚡links', ['user' => $selectedUser], key('user-links-'.$selectedUser->id))
+                @endif
+            </x-ui.slideover.body>
+        </x-ui.slideover.content>
+    </x-ui.slideover>
+
+    <x-ui.slideover id="admin-user-roles" position="right" size="md">
+        <x-ui.slideover.content>
+            <x-ui.slideover.header>
+                <x-ui.slideover.title>
+                    {{ __('app.admin.users.user_roles') }}
+                    @if($selectedUser)
+                        <span class="text-sm font-normal text-fg-muted">({{ $selectedUser->mobile }})</span>
+                    @endif
+                </x-ui.slideover.title>
+            </x-ui.slideover.header>
+
+            <x-ui.slideover.body>
+                @if($selectedUser)
+                    @livewire('pages.admin.user.⚡roles', ['user' => $selectedUser], key('user-roles-'.$selectedUser->id))
+                @endif
+            </x-ui.slideover.body>
         </x-ui.slideover.content>
     </x-ui.slideover>
 </div>
