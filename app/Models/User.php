@@ -12,13 +12,14 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
+use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['mobile', 'registration_ip', 'api_token'])]
 #[Hidden(['remember_token', 'api_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use AuthenticationLoggable, HasFactory, HasOneTimePasswords, Notifiable;
+    use AuthenticationLoggable, HasFactory, HasOneTimePasswords, Notifiable, HasRoles;
 
     /**
      * @return list<string>
