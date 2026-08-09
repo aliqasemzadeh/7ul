@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::livewire('/links', 'pages::admin.link.index')->name('links.index');
         Route::livewire('/functions', 'pages::admin.function.index')->name('functions.index');
         Route::livewire('/settings', 'pages::admin.setting.index')->name('settings.index');
+        Route::livewire('/backups', 'pages::admin.backup.index')->name('backups.index');
     });
 });
 

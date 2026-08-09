@@ -39,6 +39,13 @@
             'icon' => 'icon-[hugeicons--settings-01]',
             'isActive' => $currentRoute === 'admin.settings.index',
         ],
+        [
+            'id' => 'backups',
+            'href' => route('admin.backups.index'),
+            'text' => __('app.admin.nav.backups'),
+            'icon' => 'icon-[hugeicons--database-02]',
+            'isActive' => $currentRoute === 'admin.backups.index',
+        ],
     ];
 @endphp
 

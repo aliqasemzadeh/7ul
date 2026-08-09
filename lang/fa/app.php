@@ -120,6 +120,7 @@ return [
             'links' => 'لینک‌ها',
             'functions' => 'توابع',
             'settings' => 'تنظیمات',
+            'backups' => 'پشتیبان‌گیری',
         ],
         'users' => [
             'title' => 'مدیریت کاربران | 7UL.ir',
