@@ -11,7 +11,12 @@
     $isRtl = str_starts_with($localeRoot, 'fa') || str_starts_with($localeRoot, 'ar');
     $htmlLang = $lang ?? str_replace('_', '-', $locale);
     $htmlDir = $dir ?? ($isRtl ? 'rtl' : 'ltr');
-    $pageTitle = $title ?? config('app.name', 'Laravel');
+    /** @var \App\Settings\SiteSettings $siteSettings */
+    $siteSettings = app(\App\Settings\SiteSettings::class);
+    $defaultTitle = filled($siteSettings->site_name) ? $siteSettings->site_name : config('app.name', 'Laravel');
+    $pageTitle = $title ?? $defaultTitle;
+    $metaDescription = $siteSettings->site_description;
+    $faviconUrl = $siteSettings->faviconUrl() ?? $siteSettings->logoUrl();
 @endphp
 <!doctype html>
 <html lang="{{ $htmlLang }}" dir="{{ $htmlDir }}">
@@ -19,6 +24,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $pageTitle }}</title>
+    @if (filled($metaDescription))
+        <meta name="description" content="{{ $metaDescription }}">
+    @endif
+    @if ($faviconUrl)
+        <link rel="icon" href="{{ $faviconUrl }}">
+    @endif
 
     @livewireStyles
     @vite(['resources/css/app.css'])

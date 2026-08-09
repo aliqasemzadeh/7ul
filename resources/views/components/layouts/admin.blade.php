@@ -57,17 +57,14 @@
         class="fixed inset-y-0 start-0 z-80 flex h-dvh w-11/12 max-w-64 flex-col justify-between overflow-hidden border-e border-bg-muted/70 bg-bg-surface px-4 py-3 transition-all ease-linear max-md:ltr:-translate-x-full max-md:rtl:translate-x-full max-md:fx-open:translate-x-0 md:w-64 md:transition-none"
     >
         <div class="min-h-max border-b border-border py-2">
-            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-x-3 font-semibold text-fg-title" wire:navigate>
-                <span
-                    class="flex size-8 items-center justify-center rounded-ui bg-primary text-sm font-black text-white shadow-sm"
-                >
-                    {{ __('app.welcome.brand_short') }}
-                </span>
-                <span class="truncate">
-                    Seven Up
-                    <span class="text-primary">{{ __('app.admin.brand_suffix') }}</span>
-                </span>
-            </a>
+            <x-site.brand
+                :href="route('admin.users.index')"
+                size="sm"
+                text="Seven Up"
+                :accent="__('app.admin.brand_suffix')"
+                wire:navigate
+                class="font-semibold"
+            />
         </div>
 
         <nav class="flex flex-1 flex-col pt-6">
