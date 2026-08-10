@@ -275,6 +275,13 @@ new #[Layout('components.layouts.base', [
                 {{ __('app.welcome.footer.rights') }}
                 &copy; {{ now()->year }}
             </p>
+            <a
+                href="{{ route('report') }}"
+                wire:navigate
+                class="text-sm font-semibold text-fg-muted transition hover:text-fg-title"
+            >
+                {{ __('app.welcome.footer.report') }}
+            </a>
         </div>
 
         <x-site.contact-social />

@@ -57,4 +57,9 @@ class Link extends Model
     {
         return $this->hasMany(LinkVisit::class);
     }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
 }

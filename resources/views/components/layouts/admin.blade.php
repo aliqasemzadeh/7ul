@@ -26,6 +26,13 @@
             'isActive' => $currentRoute === 'admin.links.index',
         ],
         [
+            'id' => 'reports',
+            'href' => route('admin.reports.index'),
+            'text' => __('app.admin.nav.reports'),
+            'icon' => 'icon-[hugeicons--flag-01]',
+            'isActive' => in_array($currentRoute, ['admin.reports.index', 'admin.reports.check'], true),
+        ],
+        [
             'id' => 'functions',
             'href' => route('admin.functions.index'),
             'text' => __('app.admin.nav.functions'),

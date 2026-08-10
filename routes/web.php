@@ -19,6 +19,8 @@ Route::post('/logout', function () {
     return redirect()->route('home');
 })->middleware('auth')->name('logout');
 
+Route::livewire('/report', 'pages::report')->name('report');
+
 Route::middleware('auth')->group(function () {
     Route::livewire('/user', 'pages::user.index')->name('user.index');
     Route::livewire('/user/create', 'pages::user.create')->name('user.create');
@@ -32,6 +34,8 @@ Route::middleware('auth')->group(function () {
         Route::livewire('/users/{user}/links', 'pages::admin.user.links')->name('users.links');
         Route::livewire('/users/{user}/roles', 'pages::admin.user.roles')->name('users.roles');
         Route::livewire('/links', 'pages::admin.link.index')->name('links.index');
+        Route::livewire('/reports', 'pages::admin.report.index')->name('reports.index');
+        Route::livewire('/reports/{report}/check', 'pages::admin.report.check')->name('reports.check');
         Route::livewire('/functions', 'pages::admin.function.index')->name('functions.index');
         Route::livewire('/settings', 'pages::admin.setting.index')->name('settings.index');
         Route::livewire('/backups', 'pages::admin.backup.index')->name('backups.index');
