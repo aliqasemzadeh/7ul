@@ -51,7 +51,7 @@ class ReportManagementTest extends TestCase
         ]);
 
         Livewire::actingAs($admin)
-            ->test('pages::admin.report.check', ['report' => $report->id])
+            ->test('pages::admin.report.check', ['report' => $report])
             ->set('admin_note', 'Confirmed abuse')
             ->call('accept')
             ->assertHasNoErrors()
@@ -75,7 +75,7 @@ class ReportManagementTest extends TestCase
         ]);
 
         Livewire::actingAs($admin)
-            ->test('pages::admin.report.check', ['report' => $report->id])
+            ->test('pages::admin.report.check', ['report' => $report])
             ->call('reject')
             ->assertHasNoErrors()
             ->assertRedirect(route('admin.reports.index'));
