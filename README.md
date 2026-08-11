@@ -1,58 +1,270 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Seven Up Link · 7UL.ir
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <strong>سرویس کوتاه‌کننده لینک با آمار، QR و پنل مدیریت</strong><br>
+  <strong>URL shortener with analytics, QR codes, and admin panel</strong>
 </p>
 
-## About Laravel
+<p align="center">
+  <a href="#فارسی">فارسی</a> · <a href="#english">English</a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<a id="فارسی"></a>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## فارسی
 
-## Learning Laravel
+### درباره
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Seven Up Link (7UL.ir)** یک سرویس کوتاه‌کننده لینک است که به کاربران امکان می‌دهد لینک‌های طولانی را کوتاه کنند، آمار کلیک را ببینند، QR تولید کنند و از طریق API لینک بسازند. ورود با OTP موبایل، گزارش لینک‌های مشکوک و پنل ادمین کامل از دیگر بخش‌های سامانه است.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### قابلیت‌ها
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- **کوتاه‌سازی لینک** — ایجاد لینک ۸ کاراکتری با QR قابل دانلود
+- **انواع لینک** — `link`، `utm`، `iframe`، `code`، `text`
+- **آمار بازدید** — IP، دستگاه، مرورگر و سیستم‌عامل
+- **ورود با OTP** — احراز هویت با شماره موبایل و پیامک
+- **پنل کاربری** — مدیریت لینک‌ها، آمار و توکن API
+- **REST API** — ایجاد و مشاهده لینک‌ها با توکن اختصاصی
+- **گزارش لینک** — ثبت و پیگیری لینک‌های مشکوک
+- **پنل ادمین** — کاربران، لینک‌ها، گزارش‌ها، تنظیمات، پشتیبان‌گیری و اجرای دستورات
 
-## Agentic Development
+### فناوری‌ها
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| لایه | ابزار |
+|------|-------|
+| Backend | Laravel 13 · PHP 8.4 |
+| Frontend | Livewire 4 · Tailwind CSS 4 · Flexiwind |
+| Auth | Spatie One-Time Passwords · Spatie Permission |
+| تاریخ | morilog/jalali |
+| QR | endroid/qr-code |
+| پشتیبان | spatie/laravel-backup |
+
+### پیش‌نیازها
+
+- PHP 8.4+
+- Composer
+- Node.js 20+ و npm
+- MySQL 8+
+- Redis (اختیاری)
+
+### نصب
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url> 7ul
+cd 7ul
+composer setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+یا به‌صورت دستی:
 
-## Contributing
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### پیکربندی
 
-## Code of Conduct
+فایل `.env` را ویرایش کنید:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```dotenv
+APP_NAME="Seven Up Link"
+APP_URL=https://7ul.ir
 
-## Security Vulnerabilities
+DB_DATABASE=7ul
+DB_USERNAME=root
+DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# ارسال OTP
+SMS_TOKEN=
+SMS_GATEWAY=
+SMS_URL=https://srscrm.ir/api/sms/send
+```
+
+### ایجاد ادمین
+
+```bash
+php artisan app:set-user-as-admin
+# یا با شماره موبایل:
+php artisan app:set-user-as-admin 09123456789
+```
+
+دستور کاربر را ایجاد می‌کند (در صورت نبود) و نقش `admin` را به او اختصاص می‌دهد.
+
+### توسعه
+
+```bash
+composer dev
+```
+
+این دستور سرور Laravel، صف، لاگ و Vite را هم‌زمان اجرا می‌کند.
+
+```bash
+php artisan serve          # فقط سرور
+npm run dev                # فقط Vite
+```
+
+### تست
+
+```bash
+composer test
+# یا
+php artisan test --compact
+```
+
+### API
+
+پایه: `{APP_URL}/api/v1`
+
+| متد | مسیر | توضیح |
+|-----|------|-------|
+| `GET` | `/links` | لیست لینک‌های کاربر |
+| `POST` | `/links` | ایجاد لینک کوتاه |
+| `GET` | `/links/{shortCode}` | جزئیات لینک |
+| `GET` | `/links/{shortCode}/stats` | آمار بازدید |
+
+احراز هویت با هدر:
+
+```
+Authorization: Bearer {api_token}
+```
+
+توکن API از پنل کاربری (`/user/api`) قابل مشاهده و تولید مجدد است.
+
+---
+
+<a id="english"></a>
+
+## English
+
+### About
+
+**Seven Up Link (7UL.ir)** is a URL shortening service that lets users shorten long links, track click analytics, generate QR codes, and create links via API. Mobile OTP login, suspicious link reporting, and a full admin panel are included.
+
+### Features
+
+- **Link shortening** — 8-character short codes with downloadable QR codes
+- **Link types** — `link`, `utm`, `iframe`, `code`, `text`
+- **Visit analytics** — IP, device, browser, and OS tracking
+- **OTP login** — mobile number authentication via SMS
+- **User dashboard** — manage links, stats, and API tokens
+- **REST API** — create and inspect links with a personal token
+- **Link reporting** — submit and track suspicious links
+- **Admin panel** — users, links, reports, settings, backups, and command runner
+
+### Tech stack
+
+| Layer | Tools |
+|-------|-------|
+| Backend | Laravel 13 · PHP 8.4 |
+| Frontend | Livewire 4 · Tailwind CSS 4 · Flexiwind |
+| Auth | Spatie One-Time Passwords · Spatie Permission |
+| Dates | morilog/jalali |
+| QR | endroid/qr-code |
+| Backup | spatie/laravel-backup |
+
+### Requirements
+
+- PHP 8.4+
+- Composer
+- Node.js 20+ and npm
+- MySQL 8+
+- Redis (optional)
+
+### Installation
+
+```bash
+git clone <repository-url> 7ul
+cd 7ul
+composer setup
+```
+
+Or step by step:
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+```
+
+### Configuration
+
+Edit `.env`:
+
+```dotenv
+APP_NAME="Seven Up Link"
+APP_URL=https://7ul.ir
+
+DB_DATABASE=7ul
+DB_USERNAME=root
+DB_PASSWORD=
+
+# OTP delivery
+SMS_TOKEN=
+SMS_GATEWAY=
+SMS_URL=https://srscrm.ir/api/sms/send
+```
+
+### Create an admin
+
+```bash
+php artisan app:set-user-as-admin
+# or with a mobile number:
+php artisan app:set-user-as-admin 09123456789
+```
+
+The command creates the user if needed and assigns the `admin` role.
+
+### Development
+
+```bash
+composer dev
+```
+
+Runs the Laravel server, queue worker, log tail, and Vite together.
+
+```bash
+php artisan serve          # server only
+npm run dev                # Vite only
+```
+
+### Testing
+
+```bash
+composer test
+# or
+php artisan test --compact
+```
+
+### API
+
+Base URL: `{APP_URL}/api/v1`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/links` | List the authenticated user's links |
+| `POST` | `/links` | Create a short link |
+| `GET` | `/links/{shortCode}` | Show link details |
+| `GET` | `/links/{shortCode}/stats` | Visit statistics |
+
+Authenticate with:
+
+```
+Authorization: Bearer {api_token}
+```
+
+The API token is available in the user panel at `/user/api`.
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
