@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\LoginMethod;
 use App\Jobs\SendSmsJob;
 use App\Models\User;
+use App\Settings\AuthSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
+use Spatie\OneTimePasswords\Notifications\OneTimePasswordNotification;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -156,5 +160,71 @@ class LoginTest extends TestCase
         $this->actingAs($user)
             ->get(route('login'))
             ->assertRedirect(route('home'));
+    }
+
+    public function test_email_otp_login_creates_user_and_authenticates(): void
+    {
+        Notification::fake();
+
+        $settings = app(AuthSettings::class);
+        $settings->login_method = LoginMethod::EmailOtp->value;
+        $settings->save();
+
+        $component = Livewire::test('pages::auth.login')
+            ->set('email', 'otp@example.com')
+            ->call('sendCode')
+            ->assertHasNoErrors()
+            ->assertSet('step', 'otp');
+
+        $user = User::query()->where('email', 'otp@example.com')->first();
+        $this->assertNotNull($user);
+
+        Notification::assertSentTo($user, OneTimePasswordNotification::class);
+
+        $otp = $user->oneTimePasswords()->first();
+        $this->assertNotNull($otp);
+
+        $component
+            ->set('otp', $otp->password)
+            ->call('verify')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($user->fresh());
+    }
+
+    public function test_email_password_login_authenticates_existing_user(): void
+    {
+        $settings = app(AuthSettings::class);
+        $settings->login_method = LoginMethod::EmailPassword->value;
+        $settings->save();
+
+        $user = User::factory()->emailPasswordUser('user@example.com', 'password123')->create();
+
+        Livewire::test('pages::auth.login')
+            ->set('email', 'user@example.com')
+            ->set('password', 'password123')
+            ->call('loginWithPassword')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_email_password_login_rejects_invalid_credentials(): void
+    {
+        $settings = app(AuthSettings::class);
+        $settings->login_method = LoginMethod::EmailPassword->value;
+        $settings->save();
+
+        User::factory()->emailPasswordUser('user@example.com', 'password123')->create();
+
+        Livewire::test('pages::auth.login')
+            ->set('email', 'user@example.com')
+            ->set('password', 'wrong-password')
+            ->call('loginWithPassword')
+            ->assertHasErrors(['email']);
+
+        $this->assertGuest();
     }
 }

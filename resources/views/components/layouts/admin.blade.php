@@ -67,7 +67,6 @@
             <x-site.brand
                 :href="route('admin.users.index')"
                 size="sm"
-                text="Seven Up"
                 :accent="__('app.admin.brand_suffix')"
                 wire:navigate
                 class="font-semibold"

@@ -12,7 +12,7 @@
     $htmlLang = $lang ?? str_replace('_', '-', $locale);
     $htmlDir = $dir ?? ($isRtl ? 'rtl' : 'ltr');
     /** @var \App\Settings\SiteSettings $siteSettings */
-    $siteSettings = app(\App\Settings\SiteSettings::class);
+    $siteSettings = $siteSettings ?? app(\App\Settings\SiteSettings::class);
     $defaultTitle = filled($siteSettings->site_name) ? $siteSettings->site_name : config('app.name', 'Laravel');
     $pageTitle = $title ?? $defaultTitle;
     $metaDescription = $siteSettings->site_description;

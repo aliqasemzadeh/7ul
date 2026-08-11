@@ -1,10 +1,14 @@
 <?php
 
+use App\Actions\Auth\SendEmailOtp;
 use App\Actions\Auth\SendMobileOtp;
+use App\Enums\LoginMethod;
 use App\Models\User;
+use App\Settings\AuthSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Spatie\OneTimePasswords\Enums\ConsumeOneTimePasswordResult;
@@ -15,21 +19,31 @@ new #[Layout('components.layouts.base', [
     'class' => 'bg-bg text-fg min-h-screen font-sans antialiased',
 ])] class extends Component
 {
-    public string $step = 'mobile';
+    public string $step = 'identify';
 
     public string $mobile = '';
+
+    public string $email = '';
+
+    public string $password = '';
 
     public string $otp = '';
 
     public string $statusMessage = '';
 
-    public function mount(): void
+    public function mount(AuthSettings $authSettings): void
     {
         app()->setLocale('fa');
 
         if (Auth::check()) {
             $this->redirect(route('home'), navigate: true);
         }
+    }
+
+    #[Computed]
+    public function loginMethod(): LoginMethod
+    {
+        return app(AuthSettings::class)->loginMethod();
     }
 
     public function rendering($view): void
@@ -42,10 +56,20 @@ new #[Layout('components.layouts.base', [
      */
     public function rules(): array
     {
-        return [
-            'mobile' => ['required', 'string', 'regex:/^09\d{9}$/'],
-            'otp' => ['required', 'string', 'size:6'],
-        ];
+        return match ($this->loginMethod) {
+            LoginMethod::MobileOtp => [
+                'mobile' => ['required', 'string', 'regex:/^09\d{9}$/'],
+                'otp' => ['required', 'string', 'size:6'],
+            ],
+            LoginMethod::EmailOtp => [
+                'email' => ['required', 'email', 'max:255'],
+                'otp' => ['required', 'string', 'size:6'],
+            ],
+            LoginMethod::EmailPassword => [
+                'email' => ['required', 'email', 'max:255'],
+                'password' => ['required', 'string'],
+            ],
+        };
     }
 
     /**
@@ -56,6 +80,9 @@ new #[Layout('components.layouts.base', [
         return [
             'mobile.required' => __('app.auth.mobile_required'),
             'mobile.regex' => __('app.auth.mobile_invalid'),
+            'email.required' => __('app.auth.email_required'),
+            'email.email' => __('app.auth.email_invalid'),
+            'password.required' => __('app.auth.password_required'),
         ];
     }
 
@@ -64,40 +91,43 @@ new #[Layout('components.layouts.base', [
         $this->mobile = $this->normalizeIranianMobile($value);
     }
 
-    public function sendCode(SendMobileOtp $sendMobileOtp): void
+    public function sendCode(SendMobileOtp $sendMobileOtp, SendEmailOtp $sendEmailOtp): void
     {
-        $this->mobile = $this->normalizeIranianMobile($this->mobile);
-        $this->validateOnly('mobile');
-        $this->ensureIsNotRateLimited();
+        if ($this->loginMethod === LoginMethod::MobileOtp) {
+            $this->sendMobileCode($sendMobileOtp);
 
-        $user = User::query()->firstOrCreate(
-            ['mobile' => $this->mobile],
-            ['registration_ip' => request()->ip()],
-        );
+            return;
+        }
 
-        $sendMobileOtp->handle($user);
-        $this->hitRateLimiters();
+        if ($this->loginMethod === LoginMethod::EmailOtp) {
+            $this->sendEmailCode($sendEmailOtp);
 
-        $this->otp = '';
-        $this->step = 'otp';
-        $this->statusMessage = __('app.auth.otp_sent');
-        $this->resetErrorBag('otp');
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'email' => __('app.auth.user_not_found'),
+        ]);
     }
 
-    public function resendCode(SendMobileOtp $sendMobileOtp): void
+    public function resendCode(SendMobileOtp $sendMobileOtp, SendEmailOtp $sendEmailOtp): void
     {
-        $this->sendCode($sendMobileOtp);
+        $this->sendCode($sendMobileOtp, $sendEmailOtp);
     }
 
     public function verify(): void
     {
         $this->validateOnly('otp');
 
-        $user = User::query()->where('mobile', $this->mobile)->first();
+        $user = match ($this->loginMethod) {
+            LoginMethod::MobileOtp => User::query()->where('mobile', $this->mobile)->first(),
+            LoginMethod::EmailOtp => User::query()->where('email', $this->email)->first(),
+            default => null,
+        };
 
         if (! $user) {
             throw ValidationException::withMessages([
-                'mobile' => __('app.auth.user_not_found'),
+                $this->loginMethod === LoginMethod::MobileOtp ? 'mobile' : 'email' => __('app.auth.user_not_found'),
             ]);
         }
 
@@ -114,48 +144,132 @@ new #[Layout('components.layouts.base', [
         $this->redirect(route('home'), navigate: true);
     }
 
-    public function backToMobile(): void
+    public function loginWithPassword(): void
     {
-        $this->step = 'mobile';
+        if ($this->loginMethod !== LoginMethod::EmailPassword) {
+            throw ValidationException::withMessages([
+                'email' => __('app.auth.user_not_found'),
+            ]);
+        }
+
+        $this->validateOnly('email');
+        $this->validateOnly('password');
+        $this->ensureLoginIsNotRateLimited();
+
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], remember: true)) {
+            RateLimiter::hit($this->loginRateLimitKey(), 60);
+
+            throw ValidationException::withMessages([
+                'email' => __('app.auth.invalid_credentials'),
+            ]);
+        }
+
+        RateLimiter::clear($this->loginRateLimitKey());
+        session()->regenerate();
+
+        $this->redirect(route('home'), navigate: true);
+    }
+
+    public function backToIdentify(): void
+    {
+        $this->step = 'identify';
         $this->otp = '';
         $this->statusMessage = '';
         $this->resetErrorBag();
     }
 
-    protected function ensureIsNotRateLimited(): void
+    protected function sendMobileCode(SendMobileOtp $sendMobileOtp): void
     {
-        $mobileKey = $this->mobileRateLimitKey();
-        $ipKey = $this->ipRateLimitKey();
+        $this->mobile = $this->normalizeIranianMobile($this->mobile);
+        $this->validateOnly('mobile');
+        $this->ensureOtpIsNotRateLimited($this->mobile);
+
+        $user = User::query()->firstOrCreate(
+            ['mobile' => $this->mobile],
+            ['registration_ip' => request()->ip()],
+        );
+
+        $sendMobileOtp->handle($user);
+        $this->hitOtpRateLimiters($this->mobile);
+
+        $this->otp = '';
+        $this->step = 'otp';
+        $this->statusMessage = __('app.auth.otp_sent');
+        $this->resetErrorBag('otp');
+    }
+
+    protected function sendEmailCode(SendEmailOtp $sendEmailOtp): void
+    {
+        $this->email = strtolower(trim($this->email));
+        $this->validateOnly('email');
+        $this->ensureOtpIsNotRateLimited($this->email);
+
+        $user = User::query()->firstOrCreate(
+            ['email' => $this->email],
+            ['registration_ip' => request()->ip()],
+        );
+
+        $sendEmailOtp->handle($user);
+        $this->hitOtpRateLimiters($this->email);
+
+        $this->otp = '';
+        $this->step = 'otp';
+        $this->statusMessage = __('app.auth.otp_sent_email');
+        $this->resetErrorBag('otp');
+    }
+
+    protected function ensureOtpIsNotRateLimited(string $identifier): void
+    {
+        $identifierKey = $this->otpIdentifierRateLimitKey($identifier);
+        $ipKey = $this->otpIpRateLimitKey();
 
         if (RateLimiter::tooManyAttempts($ipKey, 5)) {
             throw ValidationException::withMessages([
-                'mobile' => __('app.auth.ip_throttle'),
+                $this->loginMethod === LoginMethod::MobileOtp ? 'mobile' : 'email' => __('app.auth.ip_throttle'),
             ]);
         }
 
-        if (RateLimiter::tooManyAttempts($mobileKey, 1)) {
+        if (RateLimiter::tooManyAttempts($identifierKey, 1)) {
             throw ValidationException::withMessages([
-                'mobile' => __('app.auth.throttle', [
-                    'seconds' => RateLimiter::availableIn($mobileKey),
+                $this->loginMethod === LoginMethod::MobileOtp ? 'mobile' : 'email' => __('app.auth.throttle', [
+                    'seconds' => RateLimiter::availableIn($identifierKey),
                 ]),
             ]);
         }
     }
 
-    protected function hitRateLimiters(): void
+    protected function hitOtpRateLimiters(string $identifier): void
     {
-        RateLimiter::hit($this->mobileRateLimitKey(), 60);
-        RateLimiter::hit($this->ipRateLimitKey(), 3600);
+        RateLimiter::hit($this->otpIdentifierRateLimitKey($identifier), 60);
+        RateLimiter::hit($this->otpIpRateLimitKey(), 3600);
     }
 
-    protected function mobileRateLimitKey(): string
+    protected function ensureLoginIsNotRateLimited(): void
     {
-        return 'otp-send:mobile:'.$this->mobile;
+        $key = $this->loginRateLimitKey();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw ValidationException::withMessages([
+                'email' => __('app.auth.throttle', [
+                    'seconds' => RateLimiter::availableIn($key),
+                ]),
+            ]);
+        }
     }
 
-    protected function ipRateLimitKey(): string
+    protected function otpIdentifierRateLimitKey(string $identifier): string
+    {
+        return 'otp-send:'.$this->loginMethod->value.':'.$identifier;
+    }
+
+    protected function otpIpRateLimitKey(): string
     {
         return 'otp-send:ip:'.request()->ip();
+    }
+
+    protected function loginRateLimitKey(): string
+    {
+        return 'login:'.$this->email.'|'.request()->ip();
     }
 
     protected function otpErrorMessage(ConsumeOneTimePasswordResult $result): string
@@ -180,6 +294,11 @@ new #[Layout('components.layouts.base', [
 };
 ?>
 
+@php
+    $method = $this->loginMethod;
+    $destination = $method === \App\Enums\LoginMethod::MobileOtp ? $mobile : $email;
+@endphp
+
 <div class="relative flex min-h-screen flex-col overflow-hidden">
     <div
         aria-hidden="true"
@@ -193,7 +312,6 @@ new #[Layout('components.layouts.base', [
     <header class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <x-site.brand
             :href="route('home')"
-            text="Seven Up"
             :accent="__('app.welcome.brand_accent')"
             wire:navigate
         />
@@ -206,37 +324,118 @@ new #[Layout('components.layouts.base', [
     <main class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 pb-16 pt-8 sm:px-8">
         <div class="animate-[modal-animation-in_0.5s_ease-out]">
             <p class="mb-3 text-sm font-semibold tracking-wide text-primary">
-                {{ app(\App\Settings\SiteSettings::class)->site_name ?: __('app.welcome.brand') }}
+                {{ $siteSettings->site_name ?: __('app.welcome.brand') }}
             </p>
 
-            @if ($step === 'mobile')
+            @if ($method === \App\Enums\LoginMethod::EmailPassword)
+                <h1 class="text-3xl font-black text-fg-title sm:text-4xl">
+                    {{ __('app.auth.login_heading_password') }}
+                </h1>
+                <p class="mt-3 text-fg-muted">
+                    {{ __('app.auth.login_subtitle_password') }}
+                </p>
+
+                <form wire:submit="loginWithPassword" class="mt-8 space-y-5">
+                    <div>
+                        <x-ui.input
+                            type="email"
+                            name="email"
+                            autocomplete="email"
+                            dir="ltr"
+                            :label="__('app.auth.email')"
+                            :placeholder="__('app.auth.email_placeholder')"
+                            wire:model.blur="email"
+                            :invalid="$errors->has('email')"
+                            class="w-full"
+                        />
+                        @error('email')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <x-ui.input
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            dir="ltr"
+                            :label="__('app.auth.password')"
+                            wire:model="password"
+                            :invalid="$errors->has('password')"
+                            class="w-full"
+                        />
+                        @error('password')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex justify-end text-sm">
+                        <a href="{{ route('password.request') }}" class="font-semibold text-primary transition hover:opacity-80" wire:navigate>
+                            {{ __('app.auth.forgot_password') }}
+                        </a>
+                    </div>
+
+                    <x-ui.button type="submit" size="lg" class="w-full justify-center">
+                        <span wire:loading.remove wire:target="loginWithPassword">{{ __('app.auth.login') }}</span>
+                        <span wire:loading wire:target="loginWithPassword">...</span>
+                    </x-ui.button>
+
+                    <p class="text-center text-sm text-fg-muted">
+                        {{ __('app.auth.no_account') }}
+                        <a href="{{ route('register') }}" class="font-semibold text-primary transition hover:opacity-80" wire:navigate>
+                            {{ __('app.auth.register_link') }}
+                        </a>
+                    </p>
+                </form>
+            @elseif ($step === 'identify')
                 <h1 class="text-3xl font-black text-fg-title sm:text-4xl">
                     {{ __('app.auth.login_heading') }}
                 </h1>
                 <p class="mt-3 text-fg-muted">
-                    {{ __('app.auth.login_subtitle') }}
+                    {{ $method === \App\Enums\LoginMethod::MobileOtp
+                        ? __('app.auth.login_subtitle')
+                        : __('app.auth.login_subtitle_email_otp') }}
                 </p>
 
                 <form wire:submit="sendCode" class="mt-8 space-y-5">
-                    <div>
-                        <x-ui.input
-                            type="tel"
-                            name="mobile"
-                            inputmode="numeric"
-                            autocomplete="tel"
-                            maxlength="11"
-                            pattern="09[0-9]{9}"
-                            dir="ltr"
-                            :label="__('app.auth.mobile')"
-                            :placeholder="__('app.auth.mobile_placeholder')"
-                            wire:model.blur="mobile"
-                            :invalid="$errors->has('mobile')"
-                            class="w-full"
-                        />
-                        @error('mobile')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    @if ($method === \App\Enums\LoginMethod::MobileOtp)
+                        <div>
+                            <x-ui.input
+                                type="tel"
+                                name="mobile"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                maxlength="11"
+                                pattern="09[0-9]{9}"
+                                dir="ltr"
+                                :label="__('app.auth.mobile')"
+                                :placeholder="__('app.auth.mobile_placeholder')"
+                                wire:model.blur="mobile"
+                                :invalid="$errors->has('mobile')"
+                                class="w-full"
+                            />
+                            @error('mobile')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @else
+                        <div>
+                            <x-ui.input
+                                type="email"
+                                name="email"
+                                autocomplete="email"
+                                dir="ltr"
+                                :label="__('app.auth.email')"
+                                :placeholder="__('app.auth.email_placeholder')"
+                                wire:model.blur="email"
+                                :invalid="$errors->has('email')"
+                                class="w-full"
+                            />
+                            @error('email')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
 
                     <x-ui.button type="submit" size="lg" class="w-full justify-center">
                         <span wire:loading.remove wire:target="sendCode">{{ __('app.auth.send_code') }}</span>
@@ -248,7 +447,7 @@ new #[Layout('components.layouts.base', [
                     {{ __('app.auth.otp_heading') }}
                 </h1>
                 <p class="mt-3 text-fg-muted">
-                    {{ __('app.auth.otp_subtitle', ['mobile' => $mobile]) }}
+                    {{ __('app.auth.otp_subtitle', ['destination' => $destination]) }}
                 </p>
 
                 @if ($statusMessage)
@@ -283,7 +482,7 @@ new #[Layout('components.layouts.base', [
                     </x-ui.button>
 
                     <div class="flex items-center justify-between gap-3 text-sm">
-                        <button type="button" wire:click="backToMobile" class="text-fg-muted transition hover:text-primary">
+                        <button type="button" wire:click="backToIdentify" class="text-fg-muted transition hover:text-primary">
                             {{ __('app.auth.back') }}
                         </button>
                         <button type="button" wire:click="resendCode" class="font-semibold text-primary transition hover:opacity-80">

@@ -1,5 +1,7 @@
 <?php
 
+use App\Settings\AuthSettings;
+use App\Settings\SiteSettings;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
@@ -12,7 +14,8 @@ return [
      * put them (manually) here.
      */
     'settings' => [
-
+        SiteSettings::class,
+        AuthSettings::class,
     ],
 
     /*

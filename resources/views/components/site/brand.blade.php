@@ -9,7 +9,7 @@
 
 @php
     /** @var \App\Settings\SiteSettings $settings */
-    $settings = app(\App\Settings\SiteSettings::class);
+    $settings = $siteSettings ?? app(\App\Settings\SiteSettings::class);
     $siteName = filled($settings->site_name) ? $settings->site_name : __('app.welcome.brand');
     $logoUrl = $settings->logoUrl();
     $displayText = $text ?? $siteName;

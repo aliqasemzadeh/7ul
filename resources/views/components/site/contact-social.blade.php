@@ -1,6 +1,6 @@
 @php
     /** @var \App\Settings\SiteSettings $settings */
-    $settings = app(\App\Settings\SiteSettings::class);
+    $settings = $siteSettings ?? app(\App\Settings\SiteSettings::class);
     $socialLinks = $settings->filledSocialLinks();
     $icons = [
         'telegram' => 'icon-[hugeicons--telegram]',

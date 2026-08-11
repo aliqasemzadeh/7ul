@@ -56,7 +56,6 @@
             <x-site.brand
                 :href="route('home')"
                 size="sm"
-                text="Seven Up"
                 :accent="__('app.welcome.brand_accent')"
                 wire:navigate
                 class="font-semibold"

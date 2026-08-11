@@ -122,7 +122,6 @@ new #[Layout('components.layouts.base', [
 
     <header class="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
         <x-site.brand
-            text="Seven Up"
             :accent="__('app.welcome.brand_accent')"
             :href="route('home')"
             wire:navigate

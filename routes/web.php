@@ -8,6 +8,8 @@ Route::livewire('/', 'pages::index')->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::livewire('/login', 'pages::auth.login')->name('login');
+    Route::livewire('/register', 'pages::auth.register')->name('register');
+    Route::livewire('/forget-password', 'pages::auth.forget-password')->name('password.request');
 });
 
 Route::post('/logout', function () {

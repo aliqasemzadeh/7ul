@@ -74,7 +74,6 @@ new #[Layout('components.layouts.base', [
 
     <header class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <x-site.brand
-            text="Seven Up"
             :accent="__('app.welcome.brand_accent')"
         />
 
@@ -102,7 +101,7 @@ new #[Layout('components.layouts.base', [
         {{-- Hero: brand + headline + shortener only --}}
         <section class="mx-auto flex w-full max-w-3xl flex-col items-center text-center animate-[modal-animation-in_0.6s_ease-out]">
             <p class="mb-4 text-sm font-semibold tracking-wide text-primary">
-                {{ app(\App\Settings\SiteSettings::class)->site_name ?: __('app.welcome.brand') }}
+                {{ $siteSettings->site_name ?: __('app.welcome.brand') }}
             </p>
 
             <h1 class="text-balance text-4xl font-black leading-tight text-fg-title sm:text-5xl lg:text-6xl">

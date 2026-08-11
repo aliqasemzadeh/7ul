@@ -14,12 +14,22 @@ use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['mobile', 'registration_ip', 'api_token'])]
-#[Hidden(['remember_token', 'api_token'])]
+#[Fillable(['mobile', 'email', 'password', 'registration_ip', 'api_token'])]
+#[Hidden(['password', 'remember_token', 'api_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use AuthenticationLoggable, HasFactory, HasOneTimePasswords, Notifiable, HasRoles;
+    use AuthenticationLoggable, HasFactory, HasOneTimePasswords, HasRoles, Notifiable;
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 
     /**
      * @return list<string>
@@ -27,6 +37,11 @@ class User extends Authenticatable
     public function notifyAuthenticationLogVia(): array
     {
         return [];
+    }
+
+    public function routeNotificationForMail(): ?string
+    {
+        return $this->email;
     }
 
     public function links(): HasMany

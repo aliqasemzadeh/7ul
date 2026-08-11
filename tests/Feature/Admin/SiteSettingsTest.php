@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\LoginMethod;
 use App\Models\User;
+use App\Settings\AuthSettings;
 use App\Settings\SiteSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -26,7 +28,8 @@ class SiteSettingsTest extends TestCase
         Livewire::actingAs($admin)
             ->test('pages::admin.setting.index')
             ->assertSee(__('app.admin.settings.heading'))
-            ->assertSet('form.site_name', '7UL.ir');
+            ->assertSet('form.site_name', '7UL.ir')
+            ->assertSet('authForm.login_method', LoginMethod::MobileOtp->value);
     }
 
     public function test_authenticated_user_can_update_site_settings(): void
@@ -41,11 +44,13 @@ class SiteSettingsTest extends TestCase
             ->set('form.contact_email', 'info@7ul.ir')
             ->set('form.contact_phone', '02112345678')
             ->set('form.contact_address', 'Tehran')
+            ->set('authForm.login_method', LoginMethod::EmailPassword->value)
             ->call('save')
             ->assertHasNoErrors()
             ->assertDispatched('notify');
 
         $settings = app(SiteSettings::class);
+        $authSettings = app(AuthSettings::class);
 
         $this->assertSame('Seven Up Link', $settings->site_name);
         $this->assertSame('URL shortener', $settings->site_description);
@@ -53,6 +58,7 @@ class SiteSettingsTest extends TestCase
         $this->assertSame('info@7ul.ir', $settings->contact_email);
         $this->assertSame('02112345678', $settings->contact_phone);
         $this->assertSame('Tehran', $settings->contact_address);
+        $this->assertSame(LoginMethod::EmailPassword->value, $authSettings->login_method);
     }
 
     public function test_site_name_is_required(): void
@@ -110,6 +116,7 @@ class SiteSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('Custom description for SEO', false)
             ->assertSee('hello@7ul.ir')
-            ->assertSee('https://t.me/custom', false);
+            ->assertSee('https://t.me/custom', false)
+            ->assertSee('Custom Site');
     }
 }

@@ -7,12 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
-use Livewire\WithFileUploads;
 
 class SiteSettingsForm extends Form
 {
-    use WithFileUploads;
-
     public string $site_name = '';
 
     public string $site_description = '';

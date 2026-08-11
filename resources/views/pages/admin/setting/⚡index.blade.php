@@ -1,7 +1,10 @@
 <?php
 
+use App\Enums\LoginMethod;
 use App\Livewire\Concerns\EnsuresUserIsAdmin;
+use App\Livewire\Forms\Admin\AuthSettingsForm;
 use App\Livewire\Forms\Admin\SiteSettingsForm;
+use App\Settings\AuthSettings;
 use App\Settings\SiteSettings;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -14,9 +17,12 @@ new #[Layout('components.layouts.admin')] class extends Component
 
     public SiteSettingsForm $form;
 
-    public function mount(SiteSettings $settings): void
+    public AuthSettingsForm $authForm;
+
+    public function mount(SiteSettings $settings, AuthSettings $authSettings): void
     {
         $this->form->fillFromSettings($settings);
+        $this->authForm->fillFromSettings($authSettings);
     }
 
     public function rendering($view): void
@@ -27,6 +33,7 @@ new #[Layout('components.layouts.admin')] class extends Component
     public function save(): void
     {
         $this->form->save();
+        $this->authForm->save();
 
         $this->dispatch('notify', message: __('app.admin.settings.saved'), type: 'success');
     }
@@ -143,6 +150,32 @@ new #[Layout('components.layouts.admin')] class extends Component
                         </div>
                     @endif
                 </div>
+            </div>
+        </x-ui.card>
+
+        <x-ui.card class="p-6">
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-fg-title">{{ __('app.admin.settings.auth') }}</h3>
+                <p class="text-sm text-fg-muted">{{ __('app.admin.settings.auth_help') }}</p>
+            </div>
+
+            <div class="space-y-2">
+                <x-ui.select
+                    name="authForm.login_method"
+                    :label="__('app.admin.settings.login_method')"
+                    wire:model="authForm.login_method"
+                    class="w-full"
+                >
+                    @foreach (LoginMethod::cases() as $method)
+                        <option value="{{ $method->value }}" wire:key="login-method-{{ $method->value }}">
+                            {{ $method->label() }}
+                        </option>
+                    @endforeach
+                </x-ui.select>
+                @error('authForm.login_method')
+                    <p class="text-sm text-danger">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-fg-muted">{{ __('app.admin.settings.auth_registration_note') }}</p>
             </div>
         </x-ui.card>
 
